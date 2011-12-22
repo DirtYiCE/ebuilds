@@ -1,0 +1,25 @@
+--- a/configure.ac	2011-10-23 19:21:24.968090544 +0200
++++ b/configure.ac	2011-10-23 19:23:56.830831611 +0200
+@@ -54,19 +54,10 @@
+     OPT_OBJS="main.o canvas_base.o"
+     PROGRAM="fireflies"
+ 
+-    AC_CHECK_LIB(GL, glXSwapBuffers,\
+-	AC_DEFINE(HAVE_GLX)
+-	OPT_OBJS="$OPT_OBJS canvas_glx.o",\
+-	AC_CHECK_LIB(MesaGL, glXSwapBuffers,\
+-	    AC_DEFINE(HAVE_GLX)
+-	    OPT_OBJS="$OPT_OBJS canvas_glx.o"))
+-
+-    AC_CHECK_LIB(GL, glBegin, \
+-	GL_LIBS="-lGL -lGLU", \
+-	AC_CHECK_LIB(MesaGL, glBegin, \
+-	    [GL_LIBS="-lMesaGL -lMesaGLU"], \
+-	    AC_MSG_ERROR([cannot find GL libraries])))
++    AC_DEFINE(HAVE_GLX)
++    OPT_OBJS="$OPT_OBJS canvas_glx.o"
+ 
++    GL_LIBS="-lGL -lGLU"
+     ;;
+ esac
+ 

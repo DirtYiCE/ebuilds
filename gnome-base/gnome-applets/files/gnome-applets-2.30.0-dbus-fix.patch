@@ -1,0 +1,38 @@
+diff -r -u foobar/cpufreq/src/Makefile.am gnome-applets-2.30.0/cpufreq/src/Makefile.am
+--- foobar/cpufreq/src/Makefile.am	2011-04-07 18:55:35.250510334 +0200
++++ gnome-applets-2.30.0/cpufreq/src/Makefile.am	2011-04-07 19:00:42.640510335 +0200
+@@ -5,6 +5,7 @@
+ SUBDIRS = $(selector_SUBDIR)
+ 
+ INCLUDES = \
++	$(DBUS_CFLAGS)						\
+ 	$(GNOME_APPLETS_CFLAGS) 				\
+ 	$(GNOME_LIBS2_CFLAGS)					\
+ 	$(LIBGLADE_CFLAGS)
+@@ -29,6 +30,7 @@
+ 	cpufreq-monitor-cpuinfo.c       cpufreq-monitor-cpuinfo.h
+ 
+ cpufreq_applet_LDADD =  \
++	$(DBUS_LIBS)			\
+ 	$(GNOME_APPLETS_LIBS)   	\
+ 	$(GNOME_LIBS2_LIBS)		\
+ 	$(LIBGLADE_LIBS)		\
+diff -r -u foobar/gweather/Makefile.am gnome-applets-2.30.0/gweather/Makefile.am
+--- foobar/gweather/Makefile.am	2011-04-07 18:55:35.123843667 +0200
++++ gnome-applets-2.30.0/gweather/Makefile.am	2011-04-07 18:57:57.833843667 +0200
+@@ -5,6 +5,7 @@
+ INCLUDES =				\
+ 	-I$(srcdir)			\
+ 	-I$(top_srcdir)			\
++	$(DBUS_CFLAGS)			\
+ 	$(GNOME_APPLETS_CFLAGS)		\
+ 	$(GNOME_LIBS2_CFLAGS)		\
+ 	$(LIBNOTIFY_CFLAGS)		\
+@@ -22,6 +23,7 @@
+ 	gweather-applet.c gweather-applet.h
+ 
+ gweather_applet_2_LDADD = 	\
++	$(DBUS_CFLAGS)		\
+ 	$(LIBNOTIFY_LIBS) 	\
+ 	$(GNOME_APPLETS_LIBS)	\
+ 	$(GNOME_LIBS2_LIBS)	\

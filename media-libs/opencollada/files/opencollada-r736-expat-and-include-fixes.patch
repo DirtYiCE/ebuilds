@@ -1,0 +1,47 @@
+Index: common/libBuffer/src/CommonFWriteBufferFlusher.cpp
+===================================================================
+--- common/libBuffer/src/CommonFWriteBufferFlusher.cpp	(revision 736)
++++ common/libBuffer/src/CommonFWriteBufferFlusher.cpp	(working copy)
+@@ -10,7 +10,8 @@
+ 
+ #include "CommonFWriteBufferFlusher.h"
+ 
+- #include <errno.h>
++#include <errno.h>
++#include <cstdio>
+ 
+ namespace Common
+ {
+Index: dae2ogre/include/DAE2OgreSerializer.h
+===================================================================
+--- dae2ogre/include/DAE2OgreSerializer.h	(revision 736)
++++ dae2ogre/include/DAE2OgreSerializer.h	(working copy)
+@@ -30,6 +30,8 @@
+ #ifndef __DAE2OGRE_OGRESERIALIZER_H__
+ #define __DAE2OGRE_OGRESERIALIZER_H__
+ 
++#include <cstdio>
++
+ #include "DAE2OgrePrerequisites.h"
+ 
+ namespace DAE2Ogre
+Index: Externals/expat/SConscript
+===================================================================
+--- Externals/expat/SConscript	(revision 736)
++++ Externals/expat/SConscript	(working copy)
+@@ -11,7 +11,7 @@
+ targetPath = outputDir + libName
+ 
+ 
+-incDirs = ['include/']
++incDirs = ['include/', '.']
+ 
+ src = [ variantDir + str(p) for p in  Glob(srcDir + '*.c')]   
+ VariantDir(variant_dir=variantDir + srcDir, src_dir=srcDir, duplicate=False)
+@@ -19,5 +19,5 @@
+ if env['SHAREDLIB']:
+     SharedLibrary(target=targetPath, source=src, CPPPATH=incDirs, CCFLAGS=env['CPPFLAGS'])
+ else:
+-    StaticLibrary(target=targetPath, source=src, CPPPATH=incDirs, CCFLAGS=env['CPPFLAGS'])
++    StaticLibrary(target=targetPath, source=src, CPPPATH=incDirs, CCFLAGS=env['CPPFLAGS'] + ' -DHAVE_EXPAT_CONFIG_H')
+ 
