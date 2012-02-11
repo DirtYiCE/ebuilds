@@ -1,0 +1,28 @@
+--- configure.ac.old	2012-02-11 16:23:24.898374465 +0100
++++ configure.ac	2012-02-11 16:25:03.064658283 +0100
+@@ -136,9 +136,12 @@
+ PKG_CHECK_MODULES(COMPIZMOUSEPOLL, compiz-mousepoll, [have_compiz_mousepoll=yes], [have_compiz_mousepoll=no])
+ AM_CONDITIONAL(SHOWMOUSE_PLUGIN, test "x$have_compiz_mousepoll" = "xyes")
+ 
+-PKG_CHECK_MODULES(LIBNOTIFY, libnotify gtk+-2.0, [have_libnotify=yes], [have_libnotify=no])
++AC_ARG_WITH([libnotify], [AS_HELP_STRING([--without-libnotify], [Build without libnotify support @<:@default=auto@:>@])])
++AS_IF([test "x$with_libnotify" != "xno"], [
++  PKG_CHECK_MODULES(LIBNOTIFY, libnotify, [have_libnotify=yes], [have_libnotify=no])
++])
+ AM_CONDITIONAL(NOTIFICATION_PLUGIN, test "x$have_libnotify" = "xyes")
+-if test "$have_libnotify" = yes; then
++if test "x$have_libnotify" = "xyes"; then
+   AC_DEFINE(USE_NOTIFICATION, 1, [Build notification plugin])
+   PKG_CHECK_EXISTS(libnotify >= 0.6.1, [have_libnotify_0_6_1=yes], [have_libnotify_0_6_1=no])
+   if test "$have_libnotify_0_6_1" = yes; then
+--- src/notification/notification.c.old	2012-02-11 16:34:08.345865010 +0100
++++ src/notification/notification.c	2012-02-11 16:34:18.642491520 +0100
+@@ -19,7 +19,7 @@
+  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+  */
+ 
+-
++#include "config.h"
+ #include <libnotify/notify.h>
+ #include <stdio.h>
+ #include <stdarg.h>
