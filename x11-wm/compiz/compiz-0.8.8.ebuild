@@ -14,7 +14,7 @@ LICENSE="GPL-2 LGPL-2.1 MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~ppc ~ppc64 ~x86"
 # dbus has been disabled because of bug 365121
-IUSE="+cairo fuse gnome gconf gtk kde +svg" # dbus
+IUSE="+cairo fuse gnome gconf gtk kde +svg no-restrict-resize"
 
 COMMONDEPEND="
 	dev-libs/glib:2
@@ -79,6 +79,10 @@ src_prepare() {
 	if ! use gnome || ! use gconf; then
 		epatch "${FILESDIR}"/${PN}-no-gconf.patch
 	fi
+	if use no-restrict-resize; then
+		epatch "${FILESDIR}"/${P}-resize.patch
+	fi
+
 	eautoreconf
 }
 
