@@ -72,7 +72,8 @@ src_unpack() {
 
 	# disable pyc compiling
 	mv py-compile py-compile.orig
-	ln -s $(type -P true) py-compile
+	echo > py-compile
+	chmod +x py-compile
 
 	# Invest applet tests need gconf/proxy/...
 	sed 's/^TESTS.*/TESTS=/g' -i invest-applet/invest/Makefile.am \
