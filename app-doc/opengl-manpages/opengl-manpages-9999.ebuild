@@ -28,7 +28,7 @@ SRC_URI="http://www.oasis-open.org/docbook/xml/mathml/1.1CR1/dbmathml.dtd
 	http://www.w3.org/TR/MathML2/dtd/isolat1.ent
 	http://www.w3.org/TR/MathML2/dtd/mmlextra.ent
 	http://www.w3.org/TR/MathML2/dtd/mmlalias.ent"
-ESVN_REPO_URI="https://cvs.khronos.org/svn/repos/ogl/trunk/ecosystem/public/sdk/docs/man"
+ESVN_REPO_URI="https://cvs.khronos.org/svn/repos/ogl/trunk/ecosystem/public/sdk/docs/man2"
 
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~sh ~sparc ~x86 ~x86-fbsd"
