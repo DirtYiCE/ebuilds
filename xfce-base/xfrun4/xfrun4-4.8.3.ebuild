@@ -12,7 +12,7 @@ SRC_URI="mirror://xfce/src/xfce/xfce-utils/${PV%.*}/xfce-utils-${PV}.tar.bz2"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="alpha amd64 arm hppa ia64 ppc ppc64 sparc x86 ~x86-fbsd ~x86-freebsd ~x86-interix ~amd64-linux ~x86-linux ~x86-solaris"
-IUSE="dbus debug +lock"
+IUSE="dbus debug"
 
 COMMON_DEPEND="x11-libs/libX11
 	>=x11-libs/gtk+-2.10:2
