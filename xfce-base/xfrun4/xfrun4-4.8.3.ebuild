@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/xfce-base/xfce-utils/xfce-utils-4.8.3.ebuild,v 1.10 2012/04/02 10:56:28 ssuominen Exp $
 
-EAPI=4
+EAPI=5
 inherit xfconf
 
 DESCRIPTION="Utilities for the Xfce desktop environment"
