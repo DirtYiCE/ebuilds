@@ -1,6 +1,7 @@
 EAPI=4
 inherit subversion
 
+SLOT="${PV/.*}"
 DESCRIPTION="OpenGL manpages"
 HOMEPAGE="http://www.opengl.org/discussion_boards/showthread.php/165536-Man-pages-source-available-in-Khronos-Subversion"
 SRC_URI="http://www.oasis-open.org/docbook/xml/mathml/1.1CR1/dbmathml.dtd
@@ -28,9 +29,8 @@ SRC_URI="http://www.oasis-open.org/docbook/xml/mathml/1.1CR1/dbmathml.dtd
 	http://www.w3.org/TR/MathML2/dtd/isolat1.ent
 	http://www.w3.org/TR/MathML2/dtd/mmlextra.ent
 	http://www.w3.org/TR/MathML2/dtd/mmlalias.ent"
-ESVN_REPO_URI="https://cvs.khronos.org/svn/repos/ogl/trunk/ecosystem/public/sdk/docs/man2"
+ESVN_REPO_URI="https://cvs.khronos.org/svn/repos/ogl/trunk/ecosystem/public/sdk/docs/man${SLOT}"
 
-SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~sh ~sparc ~x86 ~x86-fbsd"
 IUSE=""
 
@@ -55,5 +55,8 @@ src_compile() {
 }
 
 src_install() {
-	doman *.3G
+	for i in *.3G; do
+		mv "${i}" "`basename "${i}" .3G`.3G${SLOT}"
+	done
+	doman *.3G"${SLOT}"
 }
