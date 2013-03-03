@@ -11,8 +11,8 @@ SRC_URI=""
 KEYWORDS="~x86 ~amd64"
 LICENSE="GPL-2"
 SLOT="0"
-DEPEND=">=x11-libs/qt-core-4.4.3
-	x11-libs/qt-webkit"
+DEPEND=">=dev-qt/qtcore-4.4.3
+	dev-qt/qtwebkit"
 
 src_compile() {
 	cd "${S}"
