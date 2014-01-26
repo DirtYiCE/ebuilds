@@ -1,0 +1,7 @@
+# /etc/init.d/p910nd
+
+# Additional command line options, see p910nd(8) manpage for details.
+OPTIONS=""
+
+# Printer number, defaults to 0.
+NUMBER="0"

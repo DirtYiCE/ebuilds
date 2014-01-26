@@ -1,0 +1,9 @@
+#!/sbin/runscript
+
+command=/usr/sbin/p910nd
+command_args="${OPTIONS} ${NUMBER:-0}"
+pidfile="/run/p910${NUMBER:-0}.pid"
+
+depent() {
+	need net
+}

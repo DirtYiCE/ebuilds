@@ -1,0 +1,16 @@
+--- p910nd.c.orig	2014-01-26 22:28:45.696313398 +0100
++++ p910nd.c	2014-01-26 22:29:23.296166758 +0100
+@@ -133,11 +133,11 @@
+ #endif
+ 
+ #define		BASEPORT	9100
+-#define		PIDFILE		"/var/run/p910%cd.pid"
++#define		PIDFILE		"/run/p910%cd.pid"
+ #ifdef		LOCKFILE_DIR
+ #define		LOCKFILE	LOCKFILE_DIR "/p910%cd"
+ #else
+-#define		LOCKFILE	"/var/lock/subsys/p910%cd"
++#define		LOCKFILE	"/run/p910%cd.lock"
+ #endif
+ #ifndef		PRINTERFILE
+ #define         PRINTERFILE     "/dev/lp%c"
