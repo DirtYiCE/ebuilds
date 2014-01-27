@@ -10,7 +10,7 @@ LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64"
 
-src_patch() {
+src_prepare() {
 	epatch "${FILESDIR}/${P}-file-locations.patch"
 }
 
