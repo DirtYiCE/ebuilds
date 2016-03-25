@@ -1,0 +1,32 @@
+--- configure.ac.orig	2015-07-05 13:42:07.209227751 +0200
++++ configure.ac	2015-07-05 13:43:26.248919495 +0200
+@@ -54,13 +54,13 @@
+ AC_SUBST(GTK_CFLAGS)
+ AC_SUBST(GTK_LIBS)
+ 
+-PKG_CHECK_MODULES(LIBGNOMEUI, libgnomeui-2.0)
+-AC_SUBST(LIBGNOMEUI_CFLAGS)
+-AC_SUBST(LIBGNOMEUI_LIBS)
++dnl PKG_CHECK_MODULES(LIBGNOMEUI, libgnomeui-2.0)
++dnl AC_SUBST(LIBGNOMEUI_CFLAGS)
++dnl AC_SUBST(LIBGNOMEUI_LIBS)
+ 
+-PKG_CHECK_MODULES(GNOMEKEYRING, gnome-keyring-1)
+-AC_SUBST(GNOMEKEYRING_CFLAGS)
+-AC_SUBST(GNOMEKEYRING_LIBS)
++dnl PKG_CHECK_MODULES(GNOMEKEYRING, gnome-keyring-1)
++dnl AC_SUBST(GNOMEKEYRING_CFLAGS)
++dnl AC_SUBST(GNOMEKEYRING_LIBS)
+ 
+ PKG_CHECK_EXISTS([libnm-glib],
+ 	[PKG_CHECK_MODULES(NM_UTILS, NetworkManager >= 0.9.0 libnm-util libnm-glib libnm-glib-vpn)],
+--- Makefile.am.orig	2015-07-05 13:43:40.285531418 +0200
++++ Makefile.am	2015-07-05 13:43:48.445499594 +0200
+@@ -1,6 +1,6 @@
+ AUTOMAKE_OPTIONS = foreign
+ 
+-SUBDIRS = properties auth-dialog po
++SUBDIRS = properties po
+ 
+ dbusservicedir = $(sysconfdir)/dbus-1/system.d
+ dbusservice_DATA = nm-strongswan-service.conf
