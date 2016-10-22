@@ -6,9 +6,8 @@
 		<name>Gentoo Haskell</name>
 	</maintainer>
 	<longdescription>
-		In some cases, it is useful to know how fast a ByteString is being
-		consumed. Typically, this could be to report some measure of progress
-		to a waiting user, but it could also be to perform some form of testing
-		on input / consumption code.
+		web-routes is a portable library for type-safe URLs. This module adds
+		support for creating the URL parsers/printers automatically using
+		Template Haskell.
 	</longdescription>
 </pkgmetadata>
