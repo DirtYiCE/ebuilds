@@ -1,0 +1,21 @@
+--- Makefile.orig	2017-02-09 16:40:25.690047313 +0100
++++ Makefile	2017-02-09 16:44:12.929967852 +0100
+@@ -46,15 +46,13 @@
+ 	@rm -rf ciopfs-${VERSION}
+ 
+ install: ciopfs
+-	@echo stripping executable
+-	@strip -s ciopfs
+ 	@echo installing executable file to ${DESTDIR}${PREFIX}/bin
+ 	@mkdir -p ${DESTDIR}${PREFIX}/bin
+ 	@cp -f ciopfs ${DESTDIR}${PREFIX}/bin
+ 	@chmod 755 ${DESTDIR}${PREFIX}/bin/ciopfs
+-	@echo creating symlink ${DESTDIR}/sbin/mount.ciopfs
+-	@mkdir -p ${DESTDIR}/sbin
+-	@ln -sf ${PREFIX}/bin/ciopfs ${DESTDIR}/sbin/mount.ciopfs
++	@echo creating symlink ${DESTDIR}${PREFIX}/sbin/mount.ciopfs
++	@mkdir -p ${DESTDIR}${PREFIX}/sbin
++	@ln -sf ${PREFIX}/bin/ciopfs ${DESTDIR}${PREFIX}/sbin/mount.ciopfs
+ #	@echo installing manual page to ${DESTDIR}${MANPREFIX}/man1
+ #	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
+ #	@sed "s/VERSION/${VERSION}/g" < ciopfs.1 > ${DESTDIR}${MANPREFIX}/man1/ciopfs.1
