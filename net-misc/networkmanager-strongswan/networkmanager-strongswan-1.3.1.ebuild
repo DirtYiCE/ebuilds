@@ -18,7 +18,7 @@ KEYWORDS="~arm ~amd64 ~ppc ~x86"
 IUSE=""
 
 RDEPEND=">=net-misc/networkmanager-0.9
-	>=net-misc/strongswan-5.1.0[networkmanager]"
+	>=net-vpn/strongswan-5.1.0[networkmanager]"
 
 DEPEND="${RDEPEND}
 	dev-util/intltool
