@@ -1,0 +1,11 @@
+--- chromium-60.0.3112.40/ui/gfx/linux/client_native_pixmap_dmabuf.cc.orig	2017-09-05 01:25:29.247425402 +0200
++++ chromium-60.0.3112.40/ui/gfx/linux/client_native_pixmap_dmabuf.cc	2017-09-05 01:26:00.650743903 +0200
+@@ -38,6 +38,8 @@
+ #define DMA_BUF_IOCTL_SYNC _IOW(DMA_BUF_BASE, 0, struct dma_buf_sync)
+ #endif
+ 
++#include <sys/sysmacros.h>
++
+ namespace gfx {
+ 
+ namespace {

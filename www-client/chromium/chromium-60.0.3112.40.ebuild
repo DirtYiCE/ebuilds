@@ -187,6 +187,7 @@ src_prepare() {
 		"${FILESDIR}/${PN}-widevine-r1.patch"
 		"${FILESDIR}/${PN}-FORTIFY_SOURCE-r1.patch"
 		"${FILESDIR}/${PN}-gn-bootstrap-r8.patch"
+		"${FILESDIR}/${PN}-majorminor.patch"
 	)
 
 	default
