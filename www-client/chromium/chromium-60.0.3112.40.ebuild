@@ -187,6 +187,7 @@ src_prepare() {
 		"${FILESDIR}/${PN}-FORTIFY_SOURCE-r1.patch"
 		"${FILESDIR}/${PN}-gn-bootstrap-r8.patch"
 		"${FILESDIR}/${PN}-majorminor.patch"
+		"${FILESDIR}/${PN}-ucontext.patch"
 	)
 
 	default
