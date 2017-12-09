@@ -32,7 +32,6 @@ COMMON_DEPEND="
 	cups? ( >=net-print/cups-1.3.11:= )
 	dev-libs/expat:=
 	dev-libs/glib:2
-	<dev-libs/icu-59:=
 	dev-libs/libxslt:=
 	dev-libs/nspr:=
 	>=dev-libs/nss-3.14.3:=
@@ -248,6 +247,7 @@ src_prepare() {
 		third_party/googletest
 		third_party/hunspell
 		third_party/iccjpeg
+		third_party/icu
 		third_party/inspector_protocol
 		third_party/jinja2
 		third_party/jstemplate
@@ -376,7 +376,6 @@ src_configure() {
 	local gn_system_libraries=(
 		flac
 		harfbuzz-ng
-		icu
 		libdrm
 		libjpeg
 		libpng
@@ -593,7 +592,7 @@ src_install() {
 	doins out/Release/*.so
 
 	# Needed by bundled icu
-	# doins out/Release/icudtl.dat
+	doins out/Release/icudtl.dat
 
 	doins -r out/Release/locales
 	doins -r out/Release/resources
