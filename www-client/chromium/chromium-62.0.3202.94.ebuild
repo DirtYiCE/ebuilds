@@ -12,12 +12,16 @@ inherit check-reqs chromium-2 eutils gnome2-utils flag-o-matic multilib ninja-ut
 
 DESCRIPTION="Open-source version of Google Chrome web browser"
 HOMEPAGE="http://chromium.org/"
-SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/${P}.tar.xz"
+UNGOOGLED_PV="${PV}-1"
+SRC_URI="
+	https://commondatastorage.googleapis.com/chromium-browser-official/${P}.tar.xz
+	ungoogled? ( https://github.com/Eloston/ungoogled-chromium/archive/${UNGOOGLED_PV}.tar.gz -> ungoogled-chromium-${UNGOOGLED_PV}.tar.gz )
+"
 
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="amd64 ~arm ~arm64 ~x86"
-IUSE="component-build cups gnome-keyring gtk3 +hangouts jumbo-build kerberos neon pic +proprietary-codecs pulseaudio selinux +suid +system-ffmpeg +system-icu +system-libvpx +tcmalloc widevine"
+IUSE="component-build cups gnome-keyring gtk3 +hangouts jumbo-build kerberos neon pic +proprietary-codecs pulseaudio selinux +suid +system-ffmpeg +system-icu +system-libvpx +tcmalloc ungoogled widevine"
 RESTRICT="!system-ffmpeg? ( proprietary-codecs? ( bindist ) )"
 
 COMMON_DEPEND="
@@ -74,6 +78,7 @@ COMMON_DEPEND="
 	>=media-libs/libwebp-0.4.0:=
 	sys-libs/zlib:=[minizip]
 	kerberos? ( virtual/krb5 )
+	ungoogled? ( =dev-lang/python-3* )
 "
 # For nvidia-drivers blocker, see bug #413637 .
 RDEPEND="${COMMON_DEPEND}
@@ -151,6 +156,85 @@ PATCHES=(
 	"${FILESDIR}/${PN}-gtk2.patch"
 )
 
+UNGOOGLED_PATCHES=(
+inox-patchset/0001-fix-building-without-safebrowsing.patch
+inox-patchset/0003-disable-autofill-download-manager.patch
+inox-patchset/0004-disable-google-url-tracker.patch
+inox-patchset/0005-disable-default-extensions.patch
+inox-patchset/0006-modify-default-prefs.patch
+inox-patchset/0007-disable-web-resource-service.patch
+inox-patchset/0008-restore-classic-ntp.patch
+inox-patchset/0009-disable-google-ipv6-probes.patch
+inox-patchset/0010-disable-gcm-status-check.patch
+inox-patchset/0011-add-duckduckgo-search-engine.patch
+inox-patchset/0013-disable-missing-key-warning.patch
+inox-patchset/0014-disable-translation-lang-fetch.patch
+inox-patchset/0015-disable-update-pings.patch
+inox-patchset/0016-chromium-sandbox-pie.patch
+inox-patchset/0017-disable-new-avatar-menu.patch
+inox-patchset/0018-disable-first-run-behaviour.patch
+inox-patchset/0019-disable-battery-status-service.patch
+inox-patchset/0021-disable-rlz.patch
+inox-patchset/9000-disable-metrics.patch
+inox-patchset/9001-disable-profiler.patch
+
+debian/disable/promo.patch
+debian/disable/fuzzers.patch
+debian/disable/google-api-warning.patch
+debian/disable/device-notifications.patch
+debian/fixes/mojo.patch
+debian/fixes/crc32.patch
+debian/fixes/ps-print.patch
+
+iridium-browser/net-cert-increase-default-key-length-for-newly-gener.patch
+iridium-browser/mime_util-force-text-x-suse-ymp-to-be-downloaded.patch
+iridium-browser/prefs-only-keep-cookies-until-exit.patch
+iridium-browser/prefs-always-prompt-for-download-directory-by-defaul.patch
+iridium-browser/updater-disable-auto-update.patch
+iridium-browser/Remove-EV-certificates.patch
+iridium-browser/net-add-trk-scheme-and-help-identify-URLs-being-retr.patch
+iridium-browser/safe_browsing-disable-incident-reporting.patch
+iridium-browser/safe_browsing-disable-reporting-of-safebrowsing-over.patch
+iridium-browser/safe_browsing-support-trk-prefix.patch
+iridium-browser/all-add-trk-prefixes-to-possibly-evil-connections.patch
+iridium-browser/promo-disable-Google-promotion-fetching.patch
+iridium-browser/hotword-disable-at-build-time-by-default.patch
+iridium-browser/browser-disable-profile-auto-import-on-first-run.patch
+ungoogled-chromium/clear-http-auth-cache-menu-item.patch
+ungoogled-chromium/disable-crash-reporter.patch
+ungoogled-chromium/disable-formatting-in-omnibox.patch
+ungoogled-chromium/disable-google-host-detection.patch
+ungoogled-chromium/replace-google-search-engine-with-nosearch.patch
+ungoogled-chromium/disable-signin.patch
+ungoogled-chromium/disable-translate.patch
+ungoogled-chromium/popups-to-tabs.patch
+ungoogled-chromium/prevent-trace-url-requests.patch
+ungoogled-chromium/disable-untraceable-urls.patch
+ungoogled-chromium/add-ipv6-probing-option.patch
+ungoogled-chromium/disable-profile-avatar-downloading.patch
+ungoogled-chromium/remove-disable-setuid-sandbox-as-bad-flag.patch
+ungoogled-chromium/disable-logging-urls-to-stderr.patch
+ungoogled-chromium/change-trace-infobar-message.patch
+ungoogled-chromium/disable-gcm.patch
+ungoogled-chromium/disable-domain-reliability.patch
+ungoogled-chromium/intercept-all-modified-domains.patch
+ungoogled-chromium/disable-intranet-redirect-detector.patch
+ungoogled-chromium/fix-building-without-one-click-signin.patch
+ungoogled-chromium/enable-page-saving-on-more-pages.patch
+ungoogled-chromium/disable-download-quarantine.patch
+ungoogled-chromium/disable-gaia.patch
+ungoogled-chromium/add-flag-to-disable-trkbar.patch
+ungoogled-chromium/disable-fonts-googleapis-references.patch
+ungoogled-chromium/disable-webstore-urls.patch
+ungoogled-chromium/fix-learn-doubleclick-hsts.patch
+ungoogled-chromium/fix-building-without-reporting.patch
+ungoogled-chromium/disable-webrtc-log-uploader.patch
+ungoogled-chromium/fix-building-without-mdns-and-service-discovery.patch
+ungoogled-chromium/use-local-devtools-files.patch
+ungoogled-chromium/add-flag-to-stack-tabs.patch
+ungoogled-chromium/add-flag-to-configure-extension-downloading.patch
+)
+
 pre_build_checks() {
 	if [[ ${MERGE_TYPE} != binary ]]; then
 		local -x CPP="$(tc-getCXX) -E"
@@ -193,6 +277,26 @@ pkg_setup() {
 
 src_prepare() {
 	default
+
+	if use ungoogled; then
+		local src="${WORKDIR}/ungoogled-chromium-${UNGOOGLED_PV}"
+		local cfg="${src}/resources/configs/common"
+		einfo "ungoogled-chromium: cleaning"
+		xargs -d'\n' rm < "${cfg}"/cleaning_list || die
+
+		einfo "ungoogled-chromium: patching"
+		for patch in "${UNGOOGLED_PATCHES[@]}"; do
+			epatch "${src}/resources/patches/${patch}"
+		done
+
+		einfo "ungoogled-chromium: substituting domains"
+		# HACK! python_wrapper_setup: python3 is not supported by python2.7 (PYTHON_COMPAT)
+		/usr/bin/python3 "${src}"/utilikit/substitute_domains.py \
+				--ignore-environment \
+				--domain-regex-list "${cfg}"/domain_regex_list \
+				--domain-substitution-list "${cfg}"/domain_substitution_list \
+				--root-dir . || die
+	fi
 
 	mkdir -p third_party/node/linux/node-linux-x64/bin || die
 	ln -s "${EPREFIX}"/usr/bin/node third_party/node/linux/node-linux-x64/bin/node || die
@@ -338,6 +442,7 @@ src_prepare() {
 	fi
 
 	# Remove most bundled libraries. Some are still needed.
+	einfo "Removing bundled libraries"
 	build/linux/unbundle/remove_bundled_libraries.py "${keeplibs[@]}" --do-remove || die
 }
 
@@ -437,16 +542,34 @@ src_configure() {
 	myconf_gn+=" proprietary_codecs=$(usex proprietary-codecs true false)"
 	myconf_gn+=" ffmpeg_branding=\"${ffmpeg_branding}\""
 
-	# Set up Google API keys, see http://www.chromium.org/developers/how-tos/api-keys .
-	# Note: these are for Gentoo use ONLY. For your own distribution,
-	# please get your own set of keys. Feel free to contact chromium@gentoo.org
-	# for more info.
-	local google_api_key="AIzaSyDEAOvatFo0eTgsV_ZlEzx0ObmepsMzfAc"
-	local google_default_client_id="329227923882.apps.googleusercontent.com"
-	local google_default_client_secret="vgKG0NNv7GoDpbtoFNLxCUXu"
-	myconf_gn+=" google_api_key=\"${google_api_key}\""
-	myconf_gn+=" google_default_client_id=\"${google_default_client_id}\""
-	myconf_gn+=" google_default_client_secret=\"${google_default_client_secret}\""
+	if use ungoogled; then
+		# No google apis
+		myconf_gn+=" google_api_key=\"\""
+		myconf_gn+=" google_default_client_id=\"\""
+		myconf_gn+=" google_default_client_secret=\"\""
+
+		myconf_gn+=" enable_google_now=false"
+		myconf_gn+=" enable_hangout_services_extension=false"
+		myconf_gn+=" enable_hotwording=false"
+		myconf_gn+=" enable_mdns=false"
+		myconf_gn+=" enable_one_click_signin=false"
+		myconf_gn+=" enable_reading_list=false"
+		myconf_gn+=" enable_remoting=false"
+		myconf_gn+=" enable_reporting=false"
+		myconf_gn+=" enable_service_discovery=false"
+		myconf_gn+=" safe_browsing_mode=0"
+	else
+		# Set up Google API keys, see http://www.chromium.org/developers/how-tos/api-keys .
+		# Note: these are for Gentoo use ONLY. For your own distribution,
+		# please get your own set of keys. Feel free to contact chromium@gentoo.org
+		# for more info.
+		local google_api_key="AIzaSyDEAOvatFo0eTgsV_ZlEzx0ObmepsMzfAc"
+		local google_default_client_id="329227923882.apps.googleusercontent.com"
+		local google_default_client_secret="vgKG0NNv7GoDpbtoFNLxCUXu"
+		myconf_gn+=" google_api_key=\"${google_api_key}\""
+		myconf_gn+=" google_default_client_id=\"${google_default_client_id}\""
+		myconf_gn+=" google_default_client_secret=\"${google_default_client_secret}\""
+	fi
 
 	local myarch="$(tc-arch)"
 	if [[ $myarch = amd64 ]] ; then
