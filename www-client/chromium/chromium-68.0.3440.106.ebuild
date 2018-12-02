@@ -25,7 +25,7 @@ IUSE="component-build cups gnome-keyring gtk3 +hangouts jumbo-build kerberos neo
 RESTRICT="!system-ffmpeg? ( proprietary-codecs? ( bindist ) )"
 
 COMMON_DEPEND="
-	app-accessibility/at-spi2-atk:2
+	gtk3? ( app-accessibility/at-spi2-atk:2 )
 	app-arch/bzip2:=
 	cups? ( >=net-print/cups-1.3.11:= )
 	dev-libs/atk
@@ -679,8 +679,8 @@ src_configure() {
 	# https://bugs.gentoo.org/654216
 	addpredict /dev/dri/ #nowarn
 
-	#if ! use system-ffmpeg; then
-	if false; then
+	if ! use system-ffmpeg; then
+	#if false; then
 		local build_ffmpeg_args=""
 		if use pic && [[ "${ffmpeg_target_arch}" == "ia32" ]]; then
 			build_ffmpeg_args+=" --disable-asm"
