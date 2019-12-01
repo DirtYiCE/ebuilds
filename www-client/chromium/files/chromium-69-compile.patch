@@ -1,0 +1,33 @@
+--- a/third_party/webrtc/rtc_base/physicalsocketserver.cc~	2019-12-01 16:48:28.000000000 +0100
++++ b/third_party/webrtc/rtc_base/physicalsocketserver.cc	2019-12-01 17:13:20.748230726 +0100
+@@ -38,6 +38,8 @@
+ #undef SetPort
+ #endif
+ 
++#include <linux/sockios.h>
++
+ #include <errno.h>
+ 
+ #include <algorithm>
+--- a/third_party/blink/renderer/platform/text/character.cc~	2018-09-17 21:10:59.000000000 +0200
++++ b/third_party/blink/renderer/platform/text/character.cc	2019-12-01 17:44:19.616451058 +0100
+@@ -123,7 +123,7 @@
+ }
+ 
+ bool Character::IsHangulSlow(UChar32 character) {
+-  RETURN_HAS_PROPERTY(character, kIsHangul);
++  return false;
+ }
+ 
+ unsigned Character::ExpansionOpportunityCount(const LChar* characters,
+--- a/third_party/blink/renderer/core/dom/document.cc~	2019-12-01 16:48:21.000000000 +0100
++++ b/third_party/blink/renderer/core/dom/document.cc	2019-12-01 17:50:01.080704624 +0100
+@@ -5501,7 +5501,7 @@
+ 
+   for (unsigned i = 0; i < length;) {
+     UChar32 c;
+-    U16_NEXT(characters, i, length, c)
++    U16_NEXT(characters, i, length, c);
+     if (c == ':') {
+       if (saw_colon)
+         return ParseQualifiedNameResult(kQNMultipleColons);
