@@ -145,6 +145,7 @@ PATCHES=(
 	"${FILESDIR}/chromium-cors-string-r0.patch"
 	"${FILESDIR}/chromium-libwebp-shim-r0.patch"
 	"${FILESDIR}/chromium-ffmpeg-ebp-r1.patch"
+	"${FILESDIR}/chromium-68-compile.patch"
 )
 
 UNGOOGLED_PATCHES=(

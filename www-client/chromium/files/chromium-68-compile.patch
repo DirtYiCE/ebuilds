@@ -1,0 +1,10 @@
+--- a/third_party/webrtc/rtc_base/physicalsocketserver.cc.orig	2019-10-13 15:01:37.654925225 +0200
++++ b/third_party/webrtc/rtc_base/physicalsocketserver.cc	2019-10-13 15:04:48.265021160 +0200
+@@ -29,6 +29,7 @@
+ #include <sys/select.h>
+ #include <unistd.h>
+ #include <signal.h>
++#include <linux/sockios.h>
+ #endif
+ 
+ #if defined(WEBRTC_WIN)
