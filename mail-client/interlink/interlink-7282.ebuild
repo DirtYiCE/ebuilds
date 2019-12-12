@@ -78,10 +78,10 @@ REQUIRED_USE="
 src_prepare() {
 	# Ensure that our plugins dir is enabled by default:
 	sed -i -e "s:/usr/lib/mozilla/plugins:/usr/lib/nsbrowser/plugins:" \
-		"${S}/mozilla/xpcom/io/nsAppFileLocationProvider.cpp" \
+		"${S}/platform/xpcom/io/nsAppFileLocationProvider.cpp" \
 		|| die "sed failed to replace plugin path for 32bit!"
 	sed -i -e "s:/usr/lib64/mozilla/plugins:/usr/lib64/nsbrowser/plugins:" \
-		"${S}/mozilla/xpcom/io/nsAppFileLocationProvider.cpp" \
+		"${S}/platform/xpcom/io/nsAppFileLocationProvider.cpp" \
 		|| die "sed failed to replace plugin path for 64bit!"
 
 	default
@@ -221,7 +221,7 @@ src_install() {
 	# Gotta create the package, unpack it and manually install the files
 	# from there not to miss anything (e.g. the statusbar extension):
 	einfo "Creating the package..."
-	./mach package || die
+	./mach mozpackage || die
 	local extracted_dir="${T}/package"
 	mkdir -p "${extracted_dir}"
 	cd "${extracted_dir}"
