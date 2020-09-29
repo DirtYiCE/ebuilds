@@ -4,9 +4,9 @@
 EAPI=7
 
 DESCRIPTION="The most advanced non-linear video editor and compositor - Good Guy's version"
-HOMEPAGE="https://cinelerra-cv.org/"
+HOMEPAGE="https://cinelerra-gg.org/"
 
-IUSE="+pref opus vpx +fdk vaapi"
+IUSE="pref vpx +fdk vaapi"
 
 RDEPEND=">=sci-libs/fftw-3
 	>=media-libs/libtheora-1.1:=
@@ -35,13 +35,15 @@ SLOT="0"
 
 src_prepare() {
 	default
+
+	sed -i 's/,strip /,echo /' plugin_config cinelerra/Makefile || die
+
 	eautoreconf
 }
 
 src_configure() {
 	local myconf=(
 		$(usex pref '--prefix=/usr/local_cin' '')
-		$(usex opus '--with-opus --enable-opus' '')
 		$(usex vpx '--enable-libvpx' '')
 		$(usex vaapi --with-vaapi --without-vaapi)
 	)
