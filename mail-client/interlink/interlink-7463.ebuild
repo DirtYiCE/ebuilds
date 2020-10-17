@@ -29,7 +29,7 @@ IUSE="
 "
 #	+devtools
 
-EGIT_REPO_URI="https://github.com/binaryoutcast/binoc-central.git"
+EGIT_REPO_URI="https://github.com/DirtYiCE/binoc-central.git"
 EGIT_COMMIT="Interlink-${PV}"
 PACKAGE_V="52.9.${PV}"
 
