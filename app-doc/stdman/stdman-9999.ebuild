@@ -1,5 +1,5 @@
-EAPI=5
-inherit git-2
+EAPI=7
+inherit git-r3
 
 DESCRIPTION="cppreference.org c+++ manpages"
 HOMEPAGE="http://en.cppreference.com/w/Cppreference:Archives"
@@ -14,11 +14,8 @@ DEPEND=""
 RDEPEND=""
 
 src_prepare() {
+	eapply_user
 	sed -i '/gzip/d' do_install || die
 }
 
-src_configure() {
-	./configure --prefix=/usr || die "configure failed"
-}
-
-src_compile() { :;}
+src_compile() { :; }
