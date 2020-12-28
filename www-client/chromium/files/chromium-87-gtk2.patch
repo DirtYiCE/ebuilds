@@ -1307,7 +1307,7 @@ index 3423c5a7f0b5..dd87daa55910 100644
  
  namespace gtk {
 diff --git a/ui/gtk/native_theme_gtk.cc b/ui/gtk/native_theme_gtk.cc
-index a77c5718649d..cb7f15924b0e 100644
+index a77c5718649d..d157fc755da7 100644
 --- a/ui/gtk/native_theme_gtk.cc
 +++ b/ui/gtk/native_theme_gtk.cc
 @@ -6,362 +6,335 @@
@@ -1789,7 +1789,7 @@ index a77c5718649d..cb7f15924b0e 100644
 -    }
 +      return GetFgColor(GetTooltip(), PRELIGHT);
 +    case ui::NativeTheme::kColorId_TooltipText:
-+      return GetTextColor(GetTooltip(), NORMAL);
++      return GetFgColor(GetTooltip(), NORMAL);
  
      // Trees and Tables (implemented on GTK using the same class)
      case ui::NativeTheme::kColorId_TableBackground:
