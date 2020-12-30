@@ -1307,10 +1307,10 @@ index 3423c5a7f0b5..dd87daa55910 100644
  
  namespace gtk {
 diff --git a/ui/gtk/native_theme_gtk.cc b/ui/gtk/native_theme_gtk.cc
-index a77c5718649d..d157fc755da7 100644
+index a77c5718649d..bacbe2583678 100644
 --- a/ui/gtk/native_theme_gtk.cc
 +++ b/ui/gtk/native_theme_gtk.cc
-@@ -6,362 +6,335 @@
+@@ -6,362 +6,339 @@
  
  #include <gtk/gtk.h>
  
@@ -1668,6 +1668,8 @@ index a77c5718649d..d157fc755da7 100644
      case ui::NativeTheme::kColorId_ButtonColor:
 -      return GetBgColor("GtkButton#button");
 +      return GetBgColor(GetButton(), NORMAL);
++    case ui::NativeTheme::kColorId_ButtonHoverColor:
++      return SkColorSetA(GetBgColor(GetButton(), PRELIGHT), 0x33);
      case ui::NativeTheme::kColorId_ButtonEnabledColor:
      case ui::NativeTheme::kColorId_ButtonUncheckedColor:
 -      return GetFgColor("GtkButton#button.text-button GtkLabel");
@@ -1705,6 +1707,8 @@ index a77c5718649d..d157fc755da7 100644
 -    //       "GtkTreeView#treeview.view "
 -    //       "GtkTreeView#treeview.view.cell:selected:focus:hover");
 +      return GetBgColor(GetLabel(), INSENSITIVE);
++    case ui::NativeTheme::kColorId_ProminentButtonHoverColor:
++      return SkColorSetA(GetBgColor(GetLabel(), PRELIGHT), 0x33);
  
      // ToggleButton
      case ui::NativeTheme::kColorId_ToggleButtonTrackColorOff:
@@ -1847,7 +1851,7 @@ index a77c5718649d..d157fc755da7 100644
  
      // Alert icons
      // Fallback to the same colors as Aura.
-@@ -372,19 +345,17 @@ base::Optional<SkColor> SkColorFromColorId(
+@@ -372,19 +349,17 @@ base::Optional<SkColor> SkColorFromColorId(
        // color (the GTK window bg color) to determine if the dark
        // or light native theme should be used for the icons.
        ui::NativeTheme* fallback_theme =
@@ -1870,7 +1874,7 @@ index a77c5718649d..d157fc755da7 100644
  
      case ui::NativeTheme::kColorId_NumColors:
        NOTREACHED();
-@@ -393,328 +364,102 @@ base::Optional<SkColor> SkColorFromColorId(
+@@ -393,328 +368,102 @@ base::Optional<SkColor> SkColorFromColorId(
      default:
        break;
    }
