@@ -3,6 +3,8 @@
 
 EAPI=7
 
+WX_GTK_VER="3.0"
+
 inherit cmake-utils git-r3 multilib toolchain-funcs wxwidgets
 
 DESCRIPTION="A PlayStation 2 emulator"
@@ -12,7 +14,7 @@ EGIT_REPO_URI="https://github.com/PCSX2/${PN}.git"
 LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS=""
-IUSE="gtk3"
+IUSE=""
 
 RDEPEND="
 	app-arch/bzip2[abi_x86_32(-)]
@@ -28,13 +30,11 @@ RDEPEND="
 	sys-libs/zlib[abi_x86_32(-)]
 	virtual/libudev[abi_x86_32(-)]
 	virtual/opengl[abi_x86_32(-)]
-	!gtk3? ( x11-libs/gtk+:2[abi_x86_32(-)] )
-	gtk3? ( x11-libs/gtk+:3[abi_x86_32(-)] )
+	x11-libs/gtk+:2[abi_x86_32(-)]
 	x11-libs/libICE[abi_x86_32(-)]
 	x11-libs/libX11[abi_x86_32(-)]
 	x11-libs/libXext[abi_x86_32(-)]
-	!gtk3? ( >=x11-libs/wxGTK-3.0.4:3.0[abi_x86_32(-),X] )
-	gtk3? ( >=x11-libs/wxGTK-3.0.4-r301:3.0-gtk3[abi_x86_32(-),X] )
+	>=x11-libs/wxGTK-3.0.4:3.0[abi_x86_32(-),X]
 "
 # Ensure no incompatible headers from eselect-opengl are installed, bug #510730
 DEPEND="${RDEPEND}
@@ -83,13 +83,13 @@ src_configure() {
 		-DCMAKE_LIBRARY_PATH="/usr/$(get_libdir)/${PN}"
 		-DDOC_DIR=/usr/share/doc/"${PF}"
 		-DEGL_API=FALSE
-		-DGTK3_API=$(usex gtk3 TRUE FALSE)
+		-DGTK3_API=FALSE
 		-DPLUGIN_DIR="/usr/$(get_libdir)/${PN}"
 		# wxGTK must be built against same sdl version
 		-DSDL2_API=TRUE
 	)
 
-	WX_GTK_VER="$(usex gtk3 3.0-gtk3 3.0)" setup-wxwidgets
+	setup-wxwidgets
 	cmake-utils_src_configure
 }
 
