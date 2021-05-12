@@ -3,6 +3,7 @@
 
 EAPI=6
 
+_PYTHON_ALLOW_PY27=1
 PYTHON_COMPAT=( python2_7 )
 PYTHON_REQ_USE="xml"
 inherit autotools flag-o-matic gnome2-utils xdg toolchain-funcs python-single-r1
