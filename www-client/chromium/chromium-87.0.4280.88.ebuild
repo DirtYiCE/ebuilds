@@ -25,7 +25,7 @@ SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/${P}
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="amd64 arm64 ~x86"
-IUSE="component-build cups cpu_flags_arm_neon gtk3 +hangouts headless +js-type-check kerberos official pic +proprietary-codecs pulseaudio selinux +suid +system-ffmpeg +system-icu +tcmalloc ungoogled vaapi wayland widevine"
+IUSE="component-build cups cpu_flags_arm_neon gtk3 +hangouts headless +js-type-check kerberos official pic +proprietary-codecs pulseaudio selinux +suid +system-ffmpeg system-icu +tcmalloc ungoogled vaapi wayland widevine"
 REQUIRED_USE="
 	component-build? ( !suid )
 	wayland? ( gtk3 )
@@ -142,7 +142,7 @@ else
 		dev-libs/libxslt:=
 		>=dev-libs/re2-0.2019.08.01:=
 		>=media-libs/openh264-1.6.0:=
-		system-icu? ( >=dev-libs/icu-67.1:= )
+		system-icu? ( >=dev-libs/icu-67.1:= <dev-libs/icu-69 )
 	"
 	RDEPEND+="${COMMON_DEPEND}"
 	DEPEND+="${COMMON_DEPEND}"
@@ -332,6 +332,7 @@ src_prepare() {
 		"${FILESDIR}/chromium-87-webcodecs-deps.patch"
 		"${FILESDIR}/chromium-87-v8-icu68.patch"
 		"${FILESDIR}/chromium-87-icu68.patch"
+		"${FILESDIR}/chromium-87-glibc-2.33.patch"
 	)
 
 	if use vaapi; then
