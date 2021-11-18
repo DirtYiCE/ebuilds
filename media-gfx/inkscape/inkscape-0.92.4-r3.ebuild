@@ -1,4 +1,4 @@
-# Copyright 1999-2020 Gentoo Authors
+# Copyright 1999-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -102,6 +102,7 @@ PATCHES=(
 	"${FILESDIR}/${PN}-0.92.4-poppler-0.82.0.patch"
 	"${FILESDIR}/${PN}-0.92.4-poppler-0.83.0.patch"
 	"${FILESDIR}/${PN}-0.92.4-glibmm-2.62.patch" #715394
+	"${FILESDIR}/${PN}-0.92.4-poppler-21.11.0.patch"
 )
 
 S="${WORKDIR}/${MY_P}"

@@ -1,0 +1,11 @@
+--- inkscape-0.92.4/src/extension/internal/pdfinput/pdf-parser.cpp~	2021-11-18 14:01:50.000000000 +0100
++++ inkscape-0.92.4/src/extension/internal/pdfinput/pdf-parser.cpp	2021-11-18 14:10:25.342719731 +0100
+@@ -2210,7 +2210,7 @@
+   }
+   if (printCommands) {
+     printf("  font: tag=%s name='%s' %g\n",
+-	   font->getTag()->getCString(),
++	   font->getTag().getCString(),
+ 	   font->getName() ? font->getName()->getCString() : "???",
+ 	   args[1].getNum());
+     fflush(stdout);
