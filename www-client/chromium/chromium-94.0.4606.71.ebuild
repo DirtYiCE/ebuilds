@@ -114,7 +114,7 @@ BDEPEND="
 	')
 	>=app-arch/gzip-1.7
 	dev-lang/perl
-	>=dev-util/gn-0.1807
+	=dev-util/gn-0.1807
 	dev-vcs/git
 	>=dev-util/gperf-3.0.3
 	>=dev-util/ninja-1.7.2
@@ -347,6 +347,7 @@ src_prepare() {
 		"${FILESDIR}/chromium-93-InkDropHost-crash.patch"
 		"${FILESDIR}/chromium-use-oauth2-client-switches-as-default.patch"
 		"${FILESDIR}/chromium-shim_headers.patch"
+		"${FILESDIR}/chromium-94-sigstksz.patch"
 	)
 
 	if [[ ${SLOT} != 0 ]]; then

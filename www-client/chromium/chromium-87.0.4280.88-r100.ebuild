@@ -1,4 +1,4 @@
-# Copyright 2009-2020 Gentoo Authors
+# Copyright 2009-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -59,7 +59,6 @@ COMMON_DEPEND="
 	>=media-libs/alsa-lib-1.0.19:=
 	media-libs/fontconfig:=
 	media-libs/freetype:=
-	>=media-libs/harfbuzz-2.4.0:0=[icu(-)]
 	media-libs/libjpeg-turbo:=
 	media-libs/libpng:=
 	pulseaudio? ( media-sound/pulseaudio:= )
@@ -113,7 +112,7 @@ BDEPEND="
 	>=app-arch/gzip-1.7
 	app-arch/unzip
 	dev-lang/perl
-	>=dev-util/gn-0.1807
+	=dev-util/gn-0.1807
 	dev-vcs/git
 	>=dev-util/gperf-3.0.3
 	>=dev-util/ninja-1.7.2
@@ -339,6 +338,8 @@ src_prepare() {
 		"${FILESDIR}/chromium-87-v8-icu68.patch"
 		"${FILESDIR}/chromium-87-icu68.patch"
 		"${FILESDIR}/chromium-87-glibc-2.33.patch"
+		"${FILESDIR}/chromium-87-compile-fix.patch"
+		"${FILESDIR}/chromium-94-sigstksz.patch"
 	)
 
 	if use vaapi; then
@@ -472,7 +473,7 @@ src_prepare() {
 		third_party/google_input_tools/third_party/closure_library
 		third_party/google_input_tools/third_party/closure_library/third_party/closure
 		third_party/googletest
-		third_party/harfbuzz-ng/utils
+		third_party/harfbuzz-ng
 		third_party/hunspell
 		third_party/iccjpeg
 		third_party/inspector_protocol
@@ -718,7 +719,7 @@ src_configure() {
 	build/linux/unbundle/replace_gn_files.py --system-libraries "${gn_system_libraries[@]}" || die
 
 	# See dependency logic in third_party/BUILD.gn
-	myconf_gn+=" use_system_harfbuzz=true"
+	myconf_gn+=" use_system_harfbuzz=false"
 
 	# Disable deprecated libgnome-keyring dependency, bug #713012
 	myconf_gn+=" use_gnome_keyring=false"

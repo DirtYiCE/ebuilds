@@ -1,0 +1,62 @@
+--- chromium-87.0.4280.88/third_party/abseil-cpp/absl/synchronization/internal/graphcycles.cc.orig	2021-12-17 14:20:17.478407091 +0100
++++ chromium-87.0.4280.88/third_party/abseil-cpp/absl/synchronization/internal/graphcycles.cc	2021-12-17 14:20:26.937272717 +0100
+@@ -37,6 +37,7 @@
+ 
+ #include <algorithm>
+ #include <array>
++#include <limits>
+ #include "absl/base/internal/hide_ptr.h"
+ #include "absl/base/internal/raw_logging.h"
+ #include "absl/base/internal/spinlock.h"
+--- chromium-87.0.4280.88/third_party/abseil-cpp/absl/debugging/failure_signal_handler.cc.orig	2021-12-17 13:53:10.881592971 +0100
++++ chromium-87.0.4280.88/third_party/abseil-cpp/absl/debugging/failure_signal_handler.cc	2021-12-17 13:53:30.665336185 +0100
+@@ -135,7 +135,7 @@
+ #else
+   const size_t page_mask = sysconf(_SC_PAGESIZE) - 1;
+ #endif
+-  size_t stack_size = (std::max(SIGSTKSZ, 65536) + page_mask) & ~page_mask;
++  size_t stack_size = (std::max<size_t>(SIGSTKSZ, 65536) + page_mask) & ~page_mask;
+ #if defined(ABSL_HAVE_ADDRESS_SANITIZER) || \
+     defined(ABSL_HAVE_MEMORY_SANITIZER) || defined(ABSL_HAVE_THREAD_SANITIZER)
+   // Account for sanitizer instrumentation requiring additional stack space.
+--- chromium-87.0.4280.88/third_party/perfetto/src/trace_processor/containers/string_pool.h.orig	2021-12-17 14:31:26.520888365 +0100
++++ chromium-87.0.4280.88/third_party/perfetto/src/trace_processor/containers/string_pool.h	2021-12-17 14:31:38.756733004 +0100
+@@ -20,6 +20,7 @@
+ #include <stddef.h>
+ #include <stdint.h>
+ 
++#include <limits>
+ #include <unordered_map>
+ #include <vector>
+ 
+--- chromium-87.0.4280.88/net/dns/dns_server_iterator.h.orig	2021-12-17 15:54:56.964778596 +0100
++++ chromium-87.0.4280.88/net/dns/dns_server_iterator.h	2021-12-17 15:55:17.782460528 +0100
+@@ -5,6 +5,7 @@
+ #ifndef NET_DNS_DNS_SERVER_ITERATOR_H_
+ #define NET_DNS_DNS_SERVER_ITERATOR_H_
+ 
++#include <cstddef>
+ #include <vector>
+ 
+ #include "net/base/net_export.h"
+--- chromium-87.0.4280.88/components/bookmarks/browser/bookmark_model_observer.h.orig	2021-12-17 19:13:47.707438026 +0100
++++ chromium-87.0.4280.88/components/bookmarks/browser/bookmark_model_observer.h	2021-12-17 19:13:58.031266710 +0100
+@@ -5,6 +5,7 @@
+ #ifndef COMPONENTS_BOOKMARKS_BROWSER_BOOKMARK_MODEL_OBSERVER_H_
+ #define COMPONENTS_BOOKMARKS_BROWSER_BOOKMARK_MODEL_OBSERVER_H_
+ 
++#include <cstddef>
+ #include <set>
+ 
+ class GURL;
+--- chromium-87.0.4280.88/components/federated_learning/floc_constants.cc.orig	2021-12-17 19:17:30.912734539 +0100
++++ chromium-87.0.4280.88/components/federated_learning/floc_constants.cc	2021-12-17 19:17:39.328594918 +0100
+@@ -4,6 +4,8 @@
+ 
+ #include "components/federated_learning/floc_constants.h"
+ 
++#include <limits>
++
+ namespace federated_learning {
+ 
+ // This is only for experimentation and won't be served to websites.

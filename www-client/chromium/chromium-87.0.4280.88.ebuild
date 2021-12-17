@@ -1,4 +1,4 @@
-# Copyright 2009-2020 Gentoo Authors
+# Copyright 2009-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -59,7 +59,6 @@ COMMON_DEPEND="
 	>=media-libs/alsa-lib-1.0.19:=
 	media-libs/fontconfig:=
 	media-libs/freetype:=
-	>=media-libs/harfbuzz-2.4.0:0=[icu(-)]
 	media-libs/libjpeg-turbo:=
 	media-libs/libpng:=
 	pulseaudio? ( media-sound/pulseaudio:= )
@@ -113,7 +112,7 @@ BDEPEND="
 	>=app-arch/gzip-1.7
 	app-arch/unzip
 	dev-lang/perl
-	>=dev-util/gn-0.1807
+	=dev-util/gn-0.1807
 	dev-vcs/git
 	>=dev-util/gperf-3.0.3
 	>=dev-util/ninja-1.7.2
@@ -180,6 +179,12 @@ If you have one of above packages installed, but don't want to use
 them in Chromium, then add --password-store=basic to CHROMIUM_FLAGS
 in /etc/chromium/default.
 "
+
+if [[ ${SLOT} == 0 ]]; then
+	NAME_SUFFIX=""
+else
+	NAME_SUFFIX="-${SLOT}"
+fi
 
 pre_build_checks() {
 	if [[ ${MERGE_TYPE} != binary ]]; then
@@ -333,10 +338,16 @@ src_prepare() {
 		"${FILESDIR}/chromium-87-v8-icu68.patch"
 		"${FILESDIR}/chromium-87-icu68.patch"
 		"${FILESDIR}/chromium-87-glibc-2.33.patch"
+		"${FILESDIR}/chromium-87-compile-fix.patch"
+		"${FILESDIR}/chromium-94-sigstksz.patch"
 	)
 
 	if use vaapi; then
 		PATCHES+=( "${FILESDIR}/chromium-86-fix-vaapi-on-intel.patch" )
+	fi
+
+	if [[ ${SLOT} != 0 ]]; then
+		PATCHES+=( "${FILESDIR}/chromium-${SLOT}-slot.patch" )
 	fi
 
 	default
@@ -362,7 +373,7 @@ src_prepare() {
 			"${src}"/domain_regex.list > "${src}"/domain_regex.sed || die
 		xargs -d'\n' perl -pi "${src}"/domain_regex.sed \
 			< "${src}"/domain_substitution.list || die
-		einfo "ungoogled-chromium done"
+		einfo "ungoogled-chromium: done"
 	fi
 
 	mkdir -p third_party/node/linux/node-linux-x64/bin || die
@@ -462,7 +473,7 @@ src_prepare() {
 		third_party/google_input_tools/third_party/closure_library
 		third_party/google_input_tools/third_party/closure_library/third_party/closure
 		third_party/googletest
-		third_party/harfbuzz-ng/utils
+		third_party/harfbuzz-ng
 		third_party/hunspell
 		third_party/iccjpeg
 		third_party/inspector_protocol
@@ -708,7 +719,7 @@ src_configure() {
 	build/linux/unbundle/replace_gn_files.py --system-libraries "${gn_system_libraries[@]}" || die
 
 	# See dependency logic in third_party/BUILD.gn
-	myconf_gn+=" use_system_harfbuzz=true"
+	myconf_gn+=" use_system_harfbuzz=false"
 
 	# Disable deprecated libgnome-keyring dependency, bug #713012
 	myconf_gn+=" use_gnome_keyring=false"
@@ -924,22 +935,22 @@ src_compile() {
 	pax-mark m out/Release/chrome
 
 	# Build manpage; bug #684550
-	sed -e 's|@@PACKAGE@@|chromium-browser|g;
-		s|@@MENUNAME@@|Chromium|g;' \
+	sed -e "s|@@PACKAGE@@|chromium-browser${NAME_SUFFIX}|g;
+		s|@@MENUNAME@@|Chromium${NAME_SUFFIX}|g;" \
 		chrome/app/resources/manpage.1.in > \
-		out/Release/chromium-browser.1 || die
+		out/Release/chromium-browser${NAME_SUFFIX}.1 || die
 
 	# Build desktop file; bug #706786
-	sed -e 's|@@MENUNAME@@|Chromium|g;
-		s|@@USR_BIN_SYMLINK_NAME@@|chromium-browser|g;
-		s|@@PACKAGE@@|chromium-browser|g;
-		s|\(^Exec=\)/usr/bin/|\1|g;' \
+	sed -e "s|@@MENUNAME@@|Chromium${NAME_SUFFIX}|g;
+		s|@@USR_BIN_SYMLINK_NAME@@|chromium-browser${NAME_SUFFIX}|g;
+		s|@@PACKAGE@@|chromium-browser${NAME_SUFFIX}|g;
+		s|\(^Exec=\)/usr/bin/|\1|g;" \
 		chrome/installer/linux/common/desktop.template > \
-		out/Release/chromium-browser-chromium.desktop || die
+		out/Release/chromium-browser-chromium${NAME_SUFFIX}.desktop || die
 }
 
 src_install() {
-	local CHROMIUM_HOME="/usr/$(get_libdir)/chromium-browser"
+	local CHROMIUM_HOME="/usr/$(get_libdir)/chromium-browser${NAME_SUFFIX}"
 	exeinto "${CHROMIUM_HOME}"
 	doexe out/Release/chrome
 
@@ -953,22 +964,23 @@ src_install() {
 	local sedargs=( -e
 			"s:/usr/lib/:/usr/$(get_libdir)/:g;
 			s:@@OZONE_AUTO_SESSION@@:$(usex wayland true false):g;
-			s:@@FORCE_OZONE_PLATFORM@@:$(usex headless true false):g"
+			s:@@FORCE_OZONE_PLATFORM@@:$(usex headless true false):g
+			s:@@NAME_SUFFIX@@:${NAME_SUFFIX}:g"
 	)
-	sed "${sedargs[@]}" "${FILESDIR}/chromium-launcher-r6.sh" > chromium-launcher.sh || die
+	sed "${sedargs[@]}" "${FILESDIR}/chromium-launcher-r6-slot.sh" > chromium-launcher.sh || die
 	doexe chromium-launcher.sh
 
 	# It is important that we name the target "chromium-browser",
 	# xdg-utils expect it; bug #355517.
-	dosym "${CHROMIUM_HOME}/chromium-launcher.sh" /usr/bin/chromium-browser
+	dosym "${CHROMIUM_HOME}/chromium-launcher.sh" /usr/bin/chromium-browser${NAME_SUFFIX}
 	# keep the old symlink around for consistency
-	dosym "${CHROMIUM_HOME}/chromium-launcher.sh" /usr/bin/chromium
+	dosym "${CHROMIUM_HOME}/chromium-launcher.sh" /usr/bin/chromium${NAME_SUFFIX}
 
-	dosym "${CHROMIUM_HOME}/chromedriver" /usr/bin/chromedriver
+	dosym "${CHROMIUM_HOME}/chromedriver" /usr/bin/chromedriver${NAME_SUFFIX}
 
 	# Allow users to override command-line options, bug #357629.
 	insinto /etc/chromium
-	newins "${FILESDIR}/chromium.default" "default"
+	[[ ${SLOT} == 0 ]] && newins "${FILESDIR}/chromium.default" "default"
 
 	pushd out/Release/locales > /dev/null || die
 	chromium_remove_language_paks
@@ -1003,19 +1015,21 @@ src_install() {
 				*) branding="chrome/app/theme/chromium" ;;
 		esac
 		newicon -s ${size} "${branding}/product_logo_${size}.png" \
-			chromium-browser.png
+			chromium-browser${NAME_SUFFIX}.png
 	done
 
 	# Install desktop entry
-	domenu out/Release/chromium-browser-chromium.desktop
+	domenu out/Release/chromium-browser-chromium${NAME_SUFFIX}.desktop
 
 	# Install GNOME default application entry (bug #303100).
-	insinto /usr/share/gnome-control-center/default-apps
-	newins "${FILESDIR}"/chromium-browser.xml chromium-browser.xml
+	if [[ ${SLOT} == 0 ]]; then
+		insinto /usr/share/gnome-control-center/default-apps
+		newins "${FILESDIR}"/chromium-browser.xml chromium-browser.xml
+	fi
 
 	# Install manpage; bug #684550
-	doman out/Release/chromium-browser.1
-	dosym chromium-browser.1 /usr/share/man/man1/chromium.1
+	doman out/Release/chromium-browser${NAME_SUFFIX}.1
+	dosym chromium-browser${NAME_SUFFIX}.1 /usr/share/man/man1/chromium${NAME_SUFFIX}.1
 
 	readme.gentoo_create_doc
 }

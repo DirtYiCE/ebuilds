@@ -1,0 +1,11 @@
+--- chromium-94.0.4606.71/third_party/breakpad/breakpad/src/client/linux/handler/exception_handler.cc.orig	2021-12-17 01:58:20.924304643 +0100
++++ chromium-94.0.4606.71/third_party/breakpad/breakpad/src/client/linux/handler/exception_handler.cc	2021-12-17 01:58:39.553985303 +0100
+@@ -138,7 +138,7 @@
+   // SIGSTKSZ may be too small to prevent the signal handlers from overrunning
+   // the alternative stack. Ensure that the size of the alternative stack is
+   // large enough.
+-  static const unsigned kSigStackSize = std::max(16384, SIGSTKSZ);
++  static const unsigned kSigStackSize = std::max<size_t>(16384, SIGSTKSZ);
+ 
+   // Only set an alternative stack if there isn't already one, or if the current
+   // one is too small.
