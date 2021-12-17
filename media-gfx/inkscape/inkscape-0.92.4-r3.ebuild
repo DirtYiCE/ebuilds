@@ -103,6 +103,7 @@ PATCHES=(
 	"${FILESDIR}/${PN}-0.92.4-poppler-0.83.0.patch"
 	"${FILESDIR}/${PN}-0.92.4-glibmm-2.62.patch" #715394
 	"${FILESDIR}/${PN}-0.92.4-poppler-21.11.0.patch"
+	"${FILESDIR}/${PN}-0.92.4-gcc-11.patch"
 )
 
 S="${WORKDIR}/${MY_P}"

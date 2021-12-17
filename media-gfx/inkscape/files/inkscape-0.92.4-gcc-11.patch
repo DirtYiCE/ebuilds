@@ -1,0 +1,33 @@
+--- inkscape-0.92.4/src/ui/widget/color-icc-selector.cpp.orig	2021-12-18 00:32:55.485349558 +0100
++++ inkscape-0.92.4/src/ui/widget/color-icc-selector.cpp	2021-12-18 00:33:03.845364749 +0100
+@@ -673,7 +673,7 @@
+ 
+ #if defined(HAVE_LIBLCMS1) || defined(HAVE_LIBLCMS2)
+ struct _cmp {
+-  bool operator()(const SPObject * const & a, const SPObject * const & b)
++  bool operator()(const SPObject * const & a, const SPObject * const & b) const
+   {
+     const Inkscape::ColorProfile &a_prof = reinterpret_cast<const Inkscape::ColorProfile &>(*a);
+     const Inkscape::ColorProfile &b_prof = reinterpret_cast<const Inkscape::ColorProfile &>(*b);
+--- inkscape-0.92.4/src/ui/dialog/document-properties.cpp.orig	2021-12-18 00:30:13.085054742 +0100
++++ inkscape-0.92.4/src/ui/dialog/document-properties.cpp	2021-12-18 00:30:23.585073786 +0100
+@@ -563,7 +563,7 @@
+ }
+ 
+ struct _cmp {
+-  bool operator()(const SPObject * const & a, const SPObject * const & b)
++  bool operator()(const SPObject * const & a, const SPObject * const & b) const
+   {
+     const Inkscape::ColorProfile &a_prof = reinterpret_cast<const Inkscape::ColorProfile &>(*a);
+     const Inkscape::ColorProfile &b_prof = reinterpret_cast<const Inkscape::ColorProfile &>(*b);
+--- inkscape-0.92.4/src/vanishing-point.h.orig	2021-12-18 00:35:49.042331912 +0100
++++ inkscape-0.92.4/src/vanishing-point.h	2021-12-18 00:36:00.772353271 +0100
+@@ -116,7 +116,7 @@
+ struct VPDrag;
+ 
+ struct less_ptr : public std::binary_function<VanishingPoint *, VanishingPoint *, bool> {
+-    bool operator()(VanishingPoint *vp1, VanishingPoint *vp2) {
++    bool operator()(const VanishingPoint *vp1, const VanishingPoint *vp2) const {
+         return GPOINTER_TO_INT(vp1) < GPOINTER_TO_INT(vp2);
+     }
+ };
