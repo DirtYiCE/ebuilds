@@ -1,7 +1,8 @@
-# Copyright 1999-2020 Gentoo Authors
+# Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=8
+_PYTHON_ALLOW_PY27=1
 PYTHON_COMPAT=( python2_7 )
 GNOME2_EAUTORECONF=yes
 WANT_AUTOMAKE=
@@ -13,7 +14,7 @@ HOMEPAGE="https://www.gimp.org/"
 SRC_URI="mirror://gimp/v2.10/${P}.tar.bz2"
 LICENSE="GPL-3 LGPL-3"
 SLOT="0/2"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~x86"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~riscv ~x86"
 
 IUSE="aalib alsa aqua debug doc gnome heif jpeg2k mng openexr postscript python udev unwind vector-icons webp wmf xpm cpu_flags_ppc_altivec cpu_flags_x86_mmx cpu_flags_x86_sse"
 
@@ -29,14 +30,14 @@ COMMON_DEPEND="
 	dev-libs/libxslt
 	>=gnome-base/librsvg-2.40.6:2
 	>=media-gfx/mypaint-brushes-2.0.2:=
-	>=media-libs/babl-0.1.78
+	>=media-libs/babl-0.1.88
 	>=media-libs/fontconfig-2.12.4
 	>=media-libs/freetype-2.1.7
-	>=media-libs/gegl-0.4.26:0.4[cairo]
+	>=media-libs/gegl-0.4.34:0.4[cairo]
 	>=media-libs/gexiv2-0.10.6
-	>=media-libs/harfbuzz-0.9.19
+	>=media-libs/harfbuzz-0.9.19:=
 	>=media-libs/lcms-2.8:2
-	>=media-libs/libmypaint-1.3.0:=
+	>=media-libs/libmypaint-1.6.1:=
 	>=media-libs/libpng-1.6.25:0=
 	>=media-libs/tiff-3.5.7:0
 	net-libs/glib-networking[ssl]
@@ -50,7 +51,7 @@ COMMON_DEPEND="
 	aalib? ( media-libs/aalib )
 	alsa? ( >=media-libs/alsa-lib-1.0.0 )
 	aqua? ( >=x11-libs/gtk-mac-integration-2.0.0 )
-	heif? ( >=media-libs/libheif-1.3.2:= )
+	heif? ( >=media-libs/libheif-1.9.1:= )
 	jpeg2k? ( >=media-libs/openjpeg-2.1.0:2= )
 	mng? ( media-libs/libmng:= )
 	openexr? ( >=media-libs/openexr-1.6.1:= )
@@ -58,8 +59,8 @@ COMMON_DEPEND="
 	python? (
 	${PYTHON_DEPS}
 		$(python_gen_cond_dep '
-			>=dev-python/pycairo-1.0.2[${PYTHON_MULTI_USEDEP}]
-			>=dev-python/pygtk-2.10.4:2[${PYTHON_MULTI_USEDEP}]
+			>=dev-python/pycairo-1.0.2[${PYTHON_USEDEP}]
+			>=dev-python/pygtk-2.10.4:2[${PYTHON_USEDEP}]
 		')
 	)
 	udev? ( dev-libs/libgudev:= )
@@ -81,7 +82,6 @@ DEPEND="
 	dev-libs/appstream-glib
 	dev-util/gtk-update-icon-cache
 	>=dev-util/intltool-0.40.1
-	sys-apps/findutils
 	>=sys-devel/gettext-0.19
 	>=sys-devel/libtool-2.2
 	virtual/pkgconfig
@@ -92,6 +92,7 @@ DOCS=( "AUTHORS" "ChangeLog" "HACKING" "NEWS" "README" "README.i18n" )
 # Bugs 685210 (and duplicate 691070)
 PATCHES=(
 	"${FILESDIR}/${PN}-2.10_fix_test-appdata.patch"
+	"${FILESDIR}/${P}-py2-fix.patch"
 )
 
 pkg_setup() {
@@ -147,6 +148,7 @@ src_configure() {
 		$(use_enable cpu_flags_ppc_altivec altivec)
 		$(use_enable cpu_flags_x86_mmx mmx)
 		$(use_enable cpu_flags_x86_sse sse)
+		$(use_enable debug)
 		$(use_enable vector-icons)
 		$(use_with aalib aa)
 		$(use_with alsa)
@@ -176,15 +178,15 @@ _rename_plugins() {
 	einfo 'Renaming plug-ins to not collide with pre-2.10.6 file layout (bug #664938)...'
 	local prepend=gimp-org-
 	(
-		cd "${ED%/}"/usr/$(get_libdir)/gimp/2.0/plug-ins || die
+		cd "${ED}"/usr/$(get_libdir)/gimp/2.0/plug-ins || die
 		for plugin_slash in $(ls -d1 */); do
-		    plugin=${plugin_slash%/}
-		    if [[ -f ${plugin}/${plugin} ]]; then
+			plugin=${plugin_slash%/}
+			if [[ -f ${plugin}/${plugin} ]]; then
 			# NOTE: Folder and file name need to match for Gimp to load that plug-in
 			#       so "file-svg/file-svg" becomes "${prepend}file-svg/${prepend}file-svg"
 			mv ${plugin}/{,${prepend}}${plugin} || die
 			mv {,${prepend}}${plugin} || die
-		    fi
+			fi
 		done
 	)
 }
@@ -200,17 +202,17 @@ src_install() {
 
 	# Workaround for bug #321111 to give GIMP the least
 	# precedence on PDF documents by default
-	mv "${ED%/}"/usr/share/applications/{,zzz-}gimp.desktop || die
+	mv "${ED}"/usr/share/applications/{,zzz-}gimp.desktop || die
 
 	find "${D}" -name '*.la' -type f -delete || die
 
 	# Prevent dead symlink gimp-console.1 from downstream man page compression (bug #433527)
-	local gimp_app_version=$(get_version_component_range 1-2)
-	mv "${ED%/}"/usr/share/man/man1/gimp-console{-${gimp_app_version},}.1 || die
+	local gimp_app_version=$(ver_cut 1-2)
+	mv "${ED}"/usr/share/man/man1/gimp-console{-${gimp_app_version},}.1 || die
 
 	# Remove gimp devel-docs html files if user doesn't need it
 	if ! use doc; then
-		rm -r "${ED%/}"/usr/share/gtk-doc || die
+		rm -r "${ED}"/usr/share/gtk-doc || die
 	fi
 
 	_rename_plugins || die
