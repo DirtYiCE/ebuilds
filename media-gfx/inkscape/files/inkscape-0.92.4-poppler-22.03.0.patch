@@ -1,0 +1,14 @@
+--- inkscape-0.92.4/src/extension/internal/pdfinput/pdf-input.cpp.orig	2022-04-21 11:20:59.659937907 +0200
++++ inkscape-0.92.4/src/extension/internal/pdfinput/pdf-input.cpp	2022-04-21 11:21:28.442475638 +0200
+@@ -704,9 +704,8 @@
+ #ifndef WIN32
+     // poppler does not use glib g_open. So on win32 we must use unicode call. code was copied from
+     // glib gstdio.c
+-    GooString *filename_goo = new GooString(uri);
+-    PDFDoc *pdf_doc = new PDFDoc(filename_goo, NULL, NULL, NULL);   // TODO: Could ask for password
+-    //delete filename_goo;
++    auto filename_goo = std::make_unique<GooString>(uri);
++    PDFDoc *pdf_doc = new PDFDoc(std::move(filename_goo));   // TODO: Could ask for password
+ #else
+     wchar_t *wfilename = reinterpret_cast<wchar_t*>(g_utf8_to_utf16 (uri, -1, NULL, NULL, NULL));
+ 
