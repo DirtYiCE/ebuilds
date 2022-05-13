@@ -1,0 +1,79 @@
+--- inkscape-0.92.4/src/extension/internal/pdfinput/svg-builder.cpp~	2022-05-13 20:49:58.610680010 +0200
++++ inkscape-0.92.4/src/extension/internal/pdfinput/svg-builder.cpp	2022-05-13 20:50:20.667381765 +0200
+@@ -1017,7 +1017,7 @@
+         //sp_repr_css_attr_unref(_font_style);
+     }
+     _font_style = sp_repr_css_attr_new();
+-    GfxFont *font = state->getFont();
++    auto font = state->getFont();
+     // Store original name
+     if (font->getName()) {
+         _font_specification = font->getName()->getCString();
+--- inkscape-0.92.4/src/extension/internal/pdfinput/svg-builder.h~	2022-05-13 20:51:47.550853334 +0200
++++ inkscape-0.92.4/src/extension/internal/pdfinput/svg-builder.h	2022-05-13 20:52:55.094294156 +0200
+@@ -46,6 +46,7 @@
+ 
+ class SPCSSAttr;
+ 
++#include <memory>
+ #include <vector>
+ #include <glib.h>
+ 
+@@ -202,7 +203,7 @@
+     std::vector<SvgGraphicsState> _state_stack;
+ 
+     SPCSSAttr *_font_style;          // Current font style
+-    GfxFont *_current_font;
++    std::shared_ptr<GfxFont> _current_font;
+     const char *_font_specification;
+     double _font_scaling;
+     bool _need_font_update;
+--- inkscape-0.92.4/src/extension/internal/pdfinput/pdf-parser.cpp~	2022-05-13 20:53:37.247694583 +0200
++++ inkscape-0.92.4/src/extension/internal/pdfinput/pdf-parser.cpp	2022-05-13 20:56:37.747986133 +0200
+@@ -2199,7 +2199,7 @@
+ // TODO not good that numArgs is ignored but args[] is used:
+ void PdfParser::opSetFont(Object args[], int /*numArgs*/)
+ {
+-  GfxFont *font = res->lookupFont(args[0].getName());
++  auto font = res->lookupFont(args[0].getName());
+ 
+   if (!font) {
+     // unsetting the font (drawing no text) is better than using the
+@@ -2216,8 +2216,7 @@
+     fflush(stdout);
+   }
+ 
+-  font->incRefCnt();
+-  state->setFont(font, args[1].getNum());
++  state->setFont(std::move(font), args[1].getNum());
+   fontChanged = gTrue;
+ }
+ 
+@@ -2410,7 +2409,6 @@
+ #else
+ void PdfParser::doShowText(GooString *s) {
+ #endif
+-  GfxFont *font;
+   int wMode;
+   double riseX, riseY;
+   CharCode code;
+@@ -2429,7 +2427,7 @@
+ #endif
+   int len, n, uLen;
+ 
+-  font = state->getFont();
++  auto font = state->getFont();
+   wMode = font->getWMode();
+ 
+   builder->beginString(state);
+@@ -2482,8 +2480,8 @@
+       //out->updateCTM(state, 1, 0, 0, 1, 0, 0);
+       if (0){ /*!out->beginType3Char(state, curX + riseX, curY + riseY, tdx, tdy,
+ 			       code, u, uLen)) {*/
+-        _POPPLER_CALL_ARGS(charProc, ((Gfx8BitFont *)font)->getCharProc, code);
+-	if ((resDict = ((Gfx8BitFont *)font)->getResources())) {
++        _POPPLER_CALL_ARGS(charProc, ((Gfx8BitFont *)font.get())->getCharProc, code);
++	if ((resDict = ((Gfx8BitFont *)font.get())->getResources())) {
+ 	  pushResources(resDict);
+ 	}
+ 	if (charProc.isStream()) {

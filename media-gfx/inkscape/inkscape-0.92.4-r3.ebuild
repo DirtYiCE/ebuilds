@@ -23,7 +23,7 @@ IUSE+=" lcms nls spell static-libs visio wpg uniconvertor"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 COMMON_DEPEND="${PYTHON_DEPS}
-	>=app-text/poppler-0.26.0:=[cairo]
+	>=app-text/poppler-22.05.0:=[cairo]
 	>=dev-cpp/glibmm-2.54.1
 	>=dev-cpp/gtkmm-2.18.0:2.4
 	>=dev-cpp/cairomm-1.9.8
@@ -105,6 +105,7 @@ PATCHES=(
 	"${FILESDIR}/${PN}-0.92.4-poppler-21.11.0.patch"
 	"${FILESDIR}/${PN}-0.92.4-gcc-11.patch"
 	"${FILESDIR}/${PN}-0.92.4-poppler-22.03.0.patch"
+	"${FILESDIR}/${PN}-0.92.4-poppler-22.05.0.patch"
 )
 
 S="${WORKDIR}/${MY_P}"
