@@ -1,31 +1,32 @@
 # Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
 MODULES_OPTIONAL_USE="driver"
 inherit desktop flag-o-matic linux-mod multilib readme.gentoo-r1 \
-	systemd toolchain-funcs unpacker
+	systemd toolchain-funcs unpacker user-info
 
-NV_KERNEL_MAX="5.16"
+NV_KERNEL_MAX="5.17"
 
 DESCRIPTION="NVIDIA Accelerated Graphics Driver"
 HOMEPAGE="https://www.nvidia.com/download/index.aspx"
 SRC_URI="
 	amd64? ( https://us.download.nvidia.com/XFree86/Linux-x86_64/${PV}/NVIDIA-Linux-x86_64-${PV}.run )
 	arm64? ( https://us.download.nvidia.com/XFree86/aarch64/${PV}/NVIDIA-Linux-aarch64-${PV}.run )
-	$(printf "https://download.nvidia.com/XFree86/%s/%s-${PV}.tar.bz2 " \
+	$(printf "https://github.com/NVIDIA/%s/archive/refs/tags/${PV}.tar.gz -> %s-${PV}.tar.gz " \
 		nvidia-{installer,modprobe,persistenced,settings,xconfig}{,})"
 # nvidia-installer is unused but here for GPL-2's "distribute sources"
 S="${WORKDIR}"
 
 LICENSE="NVIDIA-r2 BSD BSD-2 GPL-2 MIT ZLIB curl openssl"
 SLOT="0/${PV%%.*}"
-KEYWORDS="-* ~amd64"
-IUSE="+X abi_x86_32 abi_x86_64 +driver persistenced static-libs +tools wayland"
+KEYWORDS="-* ~amd64 ~arm64"
+IUSE="+X abi_x86_32 abi_x86_64 +driver persistenced +static-libs +tools wayland"
 
 COMMON_DEPEND="
 	acct-group/video
+	sys-libs/glibc
 	X? ( x11-libs/libpciaccess )
 	persistenced? (
 		acct-user/nvpd
@@ -133,7 +134,8 @@ pkg_setup() {
 		ewarn "  <=sys-kernel/gentoo-kernel-${NV_KERNEL_MAX}.x"
 		ewarn "  <=sys-kernel/gentoo-sources-${NV_KERNEL_MAX}.x"
 		ewarn "You are free to try or use /etc/portage/patches, but support will"
-		ewarn "not be given and issues wait until NVIDIA releases a fixed version."
+		ewarn "not be given and issues wait until NVIDIA releases a fixed version"
+		ewarn "(Gentoo will not accept patches for this)."
 		ewarn
 		ewarn "Do _not_ file a bug report if run into issues."
 		ewarn
@@ -157,7 +159,7 @@ src_prepare() {
 	sed 's/__USER__/nvpd/' \
 		nvidia-persistenced/init/systemd/nvidia-persistenced.service.template \
 		> "${T}"/nvidia-persistenced.service || die
-	sed -i "s|/usr|${EPREFIX}/opt|" systemd/system/nvidia-powerd.service || die
+	use !amd64 || sed -i "s|/usr|${EPREFIX}/opt|" systemd/system/nvidia-powerd.service || die
 
 	# enable nvidia-drm.modeset=1 by default with USE=wayland
 	cp "${FILESDIR}"/nvidia-470.conf "${T}"/nvidia.conf || die
@@ -173,6 +175,7 @@ src_compile() {
 		HOST_LD="$(tc-getBUILD_LD)"
 		NV_USE_BUNDLED_LIBJANSSON=0
 		NV_VERBOSE=1 DO_STRIP= MANPAGE_GZIP= OUTPUTDIR=out
+		XNVCTRL_CFLAGS=-fPIC #840389
 	)
 
 	use driver && linux-mod_src_compile
@@ -218,24 +221,25 @@ src_install() {
 	)
 
 	local skip_files=(
-		$(usex X '' '
+		# nvidia_icd/layers(vulkan): skip with -X too as it uses libGLX_nvidia
+		$(usev !X "
 			libGLX_nvidia libglxserver_nvidia
-			nvidia_icd.json nvidia_layers.json')
-		$(usex wayland '' 'libnvidia-vulkan-producer')
+			nvidia_icd.json nvidia_layers.json")
+		$(usev !wayland libnvidia-vulkan-producer)
 		libGLX_indirect # non-glvnd unused fallback
 		libnvidia-gtk nvidia-{settings,xconfig} # built from source
 		libnvidia-egl-gbm 15_nvidia_gbm # gui-libs/egl-gbm
 		libnvidia-egl-wayland 10_nvidia_wayland # gui-libs/egl-wayland
 	)
 	local skip_modules=(
-		$(usex X '' 'nvfbc vdpau xdriver')
-		$(usex driver '' 'gsp')
+		$(usev !X "nvfbc vdpau xdriver")
+		$(usev !driver gsp)
 		installer nvpd # handled separately / built from source
 	)
 	local skip_types=(
 		GLVND_LIB GLVND_SYMLINK EGL_CLIENT.\* GLX_CLIENT.\* # media-libs/libglvnd
 		OPENCL_WRAPPER.\* # virtual/opencl
-		DOCUMENTATION DOT_DESKTOP .\*_SRC DKMS_CONF # handled separately / unused
+		DOCUMENTATION DOT_DESKTOP .\*_SRC DKMS_CONF SYSTEMD_UNIT # handled separately / unused
 	)
 
 	local DOCS=(
@@ -249,7 +253,7 @@ src_install() {
 	local DOC_CONTENTS="\
 Trusted users should be in the 'video' group to use NVIDIA devices.
 You can add yourself by using: gpasswd -a my-user video\
-$(usex driver "
+$(usev driver "
 
 Like all out-of-tree kernel modules, it is necessary to rebuild
 ${PN} after upgrading or rebuilding the Linux kernel
@@ -263,8 +267,8 @@ ensure \`eselect kernel list\` points to the kernel that will be
 booted before building and preferably reboot after upgrading
 ${PN} (the ebuild will emit a warning if mismatching).
 
-See '${EPREFIX}/etc/modprobe.d/nvidia.conf' for modules options." '')\
-$(use amd64 && usex abi_x86_32 '' "
+See '${EPREFIX}/etc/modprobe.d/nvidia.conf' for modules options.")\
+$(use amd64 && usev !abi_x86_32 "
 
 Note that without USE=abi_x86_32 on ${PN}, 32bit applications
 (typically using wine / steam) will not be able to use GPU acceleration.")
@@ -365,12 +369,17 @@ https://wiki.gentoo.org/wiki/NVIDIA/nvidia-drivers"
 	exeinto /lib/systemd/system-sleep
 	doexe systemd/system-sleep/nvidia
 	dobin systemd/nvidia-sleep.sh
-	systemd_dounit systemd/system/nvidia-{hibernate,powerd,resume,suspend}.service
-
-	insinto /usr/share/dbus-1/system.d
-	doins nvidia-dbus.conf
+	systemd_dounit systemd/system/nvidia-{hibernate,resume,suspend}.service
 
 	dobin nvidia-bug-report.sh
+
+	# MODULE:powerd extras
+	if use amd64; then
+		systemd_dounit systemd/system/nvidia-powerd.service
+
+		insinto /usr/share/dbus-1/system.d
+		doins nvidia-dbus.conf
+	fi
 }
 
 pkg_preinst() {
@@ -381,8 +390,8 @@ pkg_preinst() {
 	linux-mod_pkg_preinst
 
 	# set video group id based on live system (bug #491414)
-	local g=$(getent group video | cut -d: -f3)
-	[[ ${g} ]] || die "Failed to determine video group id"
+	local g=$(egetent group video | cut -d: -f3)
+	[[ ${g} =~ ^[0-9]+$ ]] || die "Failed to determine video group id (got '${g}')"
 	sed -i "s/@VIDEOGID@/${g}/" "${ED}"/etc/modprobe.d/nvidia.conf || die
 
 	# try to find driver mismatches using temporary supported-gpus.json
