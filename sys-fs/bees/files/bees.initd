@@ -1,0 +1,16 @@
+#!/sbin/openrc-run
+# Copyright 1999-2021 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+: ${BEES_CONFIG:=${SVCNAME#*.}}
+
+command="/usr/sbin/beesd"
+command_args="${BEES_CONFIG}"
+pidfile="/run/${SVCNAME}.pid"
+command_background=true
+start_stop_daemon_args="--ionice 3 --nicelevel 20 -1 /var/log/bees/${BEES_CONFIG}.log -2 /var/log/bees/${BEES_CONFIG}.log"
+required_files="/etc/bees/${BEES_CONFIG}.conf"
+
+start_pre() {
+	mkdir -p "/var/log/bees" || return 1
+}
