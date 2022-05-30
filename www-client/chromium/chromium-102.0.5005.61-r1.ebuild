@@ -13,7 +13,7 @@ inherit check-reqs chromium-2 desktop flag-o-matic ninja-utils pax-utils python-
 
 DESCRIPTION="Open-source version of Google Chrome web browser"
 HOMEPAGE="https://chromium.org/"
-UNGOOGLED_PV="${PV}-1"
+UNGOOGLED_PV="${PV}-2"
 PATCHSET="6"
 PATCHSET_NAME="chromium-$(ver_cut 1)-patchset-${PATCHSET}"
 SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/${P}.tar.xz
@@ -345,6 +345,8 @@ extra/ungoogled-chromium/add-flag-for-referrer-header.patch
 extra/bromite/fingerprinting-flags-client-rects-and-measuretext.patch
 extra/bromite/flag-max-connections-per-host.patch
 extra/bromite/flag-fingerprinting-canvas-image-data-noise.patch
+extra/ungoogled-chromium/add-flag-to-disable-tls-grease.patch
+extra/ungoogled-chromium/add-flag-to-change-http-accept-header.patch
 )
 
 src_prepare() {
@@ -374,6 +376,11 @@ src_prepare() {
 
 	if use ungoogled; then
 		local src="${WORKDIR}/ungoogled-chromium-${UNGOOGLED_PV}"
+		# https://github.com/Eloston/ungoogled-chromium/pull/1976
+		pushd "$src"
+		eapply "${FILESDIR}/ungoogled-chromium-102-https.patch"
+		popd
+
 		# ugly hack: remove-uneeded-ui.patch [sic] removes the learn
 		# more link from the incognito page, but that clashes with my
 		# incognito offensive patch, so just skip that file (the link is
@@ -1029,18 +1036,6 @@ src_compile() {
 	local -x PYTHONPATH=
 
 	#"${EPYTHON}" tools/clang/scripts/update.py --force-local-build --gcc-toolchain /usr --skip-checkout --use-system-cmake --without-android || die
-
-	# Build mksnapshot and pax-mark it.
-	local x
-	for x in mksnapshot v8_context_snapshot_generator; do
-		if tc-is-cross-compiler; then
-			eninja -C out/Release "host/${x}"
-			pax-mark m "out/Release/host/${x}"
-		else
-			eninja -C out/Release "${x}"
-			pax-mark m "out/Release/${x}"
-		fi
-	done
 
 	# Even though ninja autodetects number of CPUs, we respect
 	# user's options, for debugging with -j 1 or any other reason.
