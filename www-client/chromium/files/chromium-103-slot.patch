@@ -1,0 +1,21 @@
+diff --git a/chrome/common/channel_info_posix.cc b/chrome/common/channel_info_posix.cc
+index 5cd53f84f44bb..9603364701de7 100644
+--- a/chrome/common/channel_info_posix.cc
++++ b/chrome/common/channel_info_posix.cc
+@@ -79,6 +79,7 @@ std::string GetChannelName(WithExtendedStable with_extended_stable) {
+ }
+ 
+ std::string GetChannelSuffixForDataDir() {
++  return "-103";
+   switch (GetChannel()) {
+     case version_info::Channel::BETA:
+       return "-beta";
+@@ -120,7 +121,7 @@ std::string GetDesktopName(base::Environment* env) {
+   std::string name;
+   if (env->GetVar("CHROME_DESKTOP", &name) && !name.empty())
+     return name;
+-  return "chromium-browser.desktop";
++  return "chromium-browser-103.desktop";
+ #endif
+ }
+ #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS_LACROS)
