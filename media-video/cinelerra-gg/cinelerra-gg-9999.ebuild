@@ -6,11 +6,12 @@ EAPI=7
 DESCRIPTION="The most advanced non-linear video editor and compositor - Good Guy's version"
 HOMEPAGE="https://cinelerra-gg.org/"
 
-IUSE="pref vpx +fdk vaapi"
+IUSE="pref vpx +fdk vaapi vdpau"
 
 RDEPEND=">=sci-libs/fftw-3
 	>=media-libs/libtheora-1.1:=
-	fdk? ( media-libs/fdk-aac:= )"
+	fdk? ( media-libs/fdk-aac:= )
+	vdpau? ( x11-libs/libvdpau )"
 
 DEPEND="${RDEPEND}
         dev-lang/nasm
@@ -22,7 +23,6 @@ BDEPEND="
 
 if [[ ${PV} = *9999* ]]; then
         inherit autotools git-r3
-	#EGIT_REPO_URI="git://git.cinelerra-cv.org/goodguy/cinelerra.git"
 	EGIT_REPO_URI="git://git.cinelerra-gg.org/goodguy/cinelerra"
 	#EGIT_CLONE_TYPE=shallow
 	S="${WORKDIR}/${P}/cinelerra-5.1"
@@ -46,6 +46,7 @@ src_configure() {
 		$(usex pref '--prefix=/usr/local_cin' '')
 		$(usex vpx '--enable-libvpx' '')
 		$(usex vaapi --with-vaapi --without-vaapi)
+		$(usex vdpau --with-vdpau --without-vdpau)
 	)
 	if use fdk ; then
 		export FFMPEG_EXTRA_CFG=" --enable-libfdk-aac --enable-nonfree"
