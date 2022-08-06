@@ -1,0 +1,42 @@
+diff --git a/third_party/blink/renderer/core/dom/node.cc b/third_party/blink/renderer/core/dom/node.cc
+index bb8be7d7c3712..16f83c9f8c6ce 100644
+--- a/third_party/blink/renderer/core/dom/node.cc
++++ b/third_party/blink/renderer/core/dom/node.cc
+@@ -1691,8 +1691,6 @@ bool Node::CanStartSelection() const {
+   if (GetLayoutObject()) {
+     const ComputedStyle& style = GetLayoutObject()->StyleRef();
+     EUserSelect user_select = style.UsedUserSelect();
+-    if (user_select == EUserSelect::kNone)
+-      return false;
+     // We allow selections to begin within |user-select: text/all| sub trees
+     // but not if the element is draggable.
+     if (style.UserDrag() != EUserDrag::kElement &&
+diff --git a/third_party/blink/renderer/core/frame/smart_clip.cc b/third_party/blink/renderer/core/frame/smart_clip.cc
+index fc9d7af01b3c4..d6ee00c31e4f2 100644
+--- a/third_party/blink/renderer/core/frame/smart_clip.cc
++++ b/third_party/blink/renderer/core/frame/smart_clip.cc
+@@ -235,10 +235,6 @@ String SmartClip::ExtractTextFromNode(Node* node) {
+ 
+   StringBuilder result;
+   for (Node& current_node : NodeTraversal::InclusiveDescendantsOf(*node)) {
+-    const ComputedStyle* style = current_node.GetComputedStyle();
+-    if (!style || style->UsedUserSelect() == EUserSelect::kNone)
+-      continue;
+-
+     if (Node* node_from_frame = NodeInsideFrame(&current_node))
+       result.Append(ExtractTextFromNode(node_from_frame));
+ 
+diff --git a/third_party/blink/renderer/core/style/computed_style.h b/third_party/blink/renderer/core/style/computed_style.h
+index ccf6f3aa635c5..7147fa5131eaa 100644
+--- a/third_party/blink/renderer/core/style/computed_style.h
++++ b/third_party/blink/renderer/core/style/computed_style.h
+@@ -2259,8 +2259,7 @@ class ComputedStyle : public ComputedStyleBase,
+   }
+ 
+   bool IsSelectable() const {
+-    return !IsInert() && !(UserSelectInternal() == EUserSelect::kNone &&
+-                           UserModifyInternal() == EUserModify::kReadOnly);
++    return !IsInert();
+   }
+ 
+   bool IsFocusable() const {
