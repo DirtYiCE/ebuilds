@@ -27,7 +27,7 @@ SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/${P}
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="~amd64 ~arm64"
-IUSE="+X component-build cups cpu_flags_arm_neon debug +gtk2 gtk3 gtk4 +hangouts headless +js-type-check kerberos libcxx lto offensive +official pgo pic +proprietary-codecs pulseaudio screencast selinux +suid +system-ffmpeg +system-harfbuzz +system-icu +system-png ungoogled user-select vaapi wayland widevine"
+IUSE="+X component-build cups cpu_flags_arm_neon debug +gtk2 gtk3 gtk4 +hangouts headless +js-type-check kerberos libcxx lto offensive +official pgo pic +proprietary-codecs pulseaudio screencast selinux +suid +system-ffmpeg +system-harfbuzz +system-icu +system-png ungoogled unsafe-pac user-select vaapi wayland widevine"
 REQUIRED_USE="
 	component-build? ( !suid !libcxx )
 	screencast? ( wayland )
@@ -334,6 +334,7 @@ src_prepare() {
 	use gtk2 && PATCHES+=("${FILESDIR}/chromium-$(ver_cut 1)-gtk2.patch")
 	use user-select || PATCHES+=("${FILESDIR}/chromium-$(ver_cut 1)-user-select.patch")
 	use offensive && PATCHES+=("${FILESDIR}/chromium-$(ver_cut 1)-offensive.patch")
+	use unsafe-pac && PATCHES+=("${FILESDIR}/chromium-$(ver_cut 1)-unsafe-pac.patch")
 
 	default
 

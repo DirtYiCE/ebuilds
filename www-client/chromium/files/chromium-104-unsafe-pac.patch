@@ -1,0 +1,16 @@
+diff --git a/net/proxy_resolution/configured_proxy_resolution_service.cc b/net/proxy_resolution/configured_proxy_resolution_service.cc
+index 30072447d145c..8186b78a150b1 100644
+--- a/net/proxy_resolution/configured_proxy_resolution_service.cc
++++ b/net/proxy_resolution/configured_proxy_resolution_service.cc
+@@ -393,11 +393,6 @@ GURL SanitizeUrl(const GURL& url) {
+   replacements.ClearPassword();
+   replacements.ClearRef();
+ 
+-  if (url.SchemeIsCryptographic()) {
+-    replacements.ClearPath();
+-    replacements.ClearQuery();
+-  }
+-
+   return url.ReplaceComponents(replacements);
+ }
+ 
