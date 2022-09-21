@@ -1,0 +1,13 @@
+--- pcsx2-9999/cmake/SearchForStuff.cmake.orig	2022-09-09 17:05:04.778558325 +0200
++++ pcsx2-9999/cmake/SearchForStuff.cmake	2022-09-09 17:05:14.027222338 +0200
+@@ -162,9 +162,9 @@
+ 			check_lib(GTK3 gtk+-3.0 gtk/gtk.h)
+ 			alias_library(GTK::gtk PkgConfig::GTK3)
+ 		endif()
++		endif()
+ 		## Use pcsx2 package to find module
+ 		find_package(HarfBuzz)
+-		endif()
+ 		if(WAYLAND_API)
+ 			find_package(Wayland REQUIRED)
+ 		endif()
