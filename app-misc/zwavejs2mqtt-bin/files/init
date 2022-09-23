@@ -1,0 +1,11 @@
+#!/sbin/openrc-run
+
+pidfile="/run/${SVCNAME}.pid"
+output_log="/var/log/${SVCNAME}/stdout.log"
+error_log="/var/log/${SVCNAME}/stderr.log"
+
+directory="/var/lib/${SVCNAME}"
+command_user="zwavejs2mqtt"
+command_background=true
+command="zwavejs2mqtt"
+

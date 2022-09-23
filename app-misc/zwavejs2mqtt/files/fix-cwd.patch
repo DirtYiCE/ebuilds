@@ -1,0 +1,11 @@
+--- zwavejs2mqtt-7.1.0/lib/utils.ts.orig	2022-09-16 18:20:24.061648871 +0200
++++ zwavejs2mqtt-7.1.0/lib/utils.ts	2022-09-16 18:20:58.901636375 +0200
+@@ -69,7 +69,7 @@
+  *  the path of the snapshot is not writable
+  */
+ export function getPath(write: boolean): string {
+-	if (write && hasProperty(process, 'pkg')) return process.cwd()
++	if (write) return process.cwd()
+ 	else return appRoot.toString()
+ }
+ 

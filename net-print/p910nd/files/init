@@ -1,8 +1,8 @@
-#!/sbin/runscript
+#!/sbin/openrc-run
 
 command=/usr/sbin/p910nd
 command_args="${OPTIONS} ${NUMBER:-0}"
-pidfile="/run/p910${NUMBER:-0}.pid"
+pidfile="/run/p910${NUMBER:-0}d.pid"
 
 depent() {
 	need net

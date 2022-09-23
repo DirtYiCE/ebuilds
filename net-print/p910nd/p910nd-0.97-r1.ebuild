@@ -1,17 +1,16 @@
-EAPI=5
-
-inherit eutils
+EAPI=8
 
 DESCRIPTION="Non-spooling printer daemon"
 HOMEPAGE="http://p910nd.sourceforge.net/"
-SRC_URI="mirror://sourceforge/p910nd/${P}.tar.bz2"
+SRC_URI="https://github.com/kenyapcomau/${PN}/archive/refs/tags/${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64"
 
 src_prepare() {
-	epatch "${FILESDIR}/${P}-file-locations.patch"
+	eapply -p0 "${FILESDIR}/${P}-file-locations.patch"
+	eapply_user
 }
 
 src_install() {

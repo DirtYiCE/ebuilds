@@ -1,0 +1,11 @@
+#!/sbin/openrc-run
+
+pidfile="/run/${SVCNAME}.pid"
+output_log="/var/log/${SVCNAME}/stdout.log"
+error_log="/var/log/${SVCNAME}/stderr.log"
+
+directory="/var/lib/${SVCNAME}"
+command_user="node_red"
+command_background=true
+command="node-red"
+command_args="--port ${NODE_RED_PORT-1880} --userDir ${NODE_RED_DIR-/var/lib/node-red} ${NODE_RED_OPTIONS}"
