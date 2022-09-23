@@ -1,0 +1,58 @@
+diff --git a/chrome/browser/resources/ntp4/incognito_tab.html b/chrome/browser/resources/ntp4/incognito_tab.html
+index bef88b17f1b5c..1e77e69aaf8d0 100644
+--- a/chrome/browser/resources/ntp4/incognito_tab.html
++++ b/chrome/browser/resources/ntp4/incognito_tab.html
+@@ -24,13 +24,10 @@ document.querySelector('#incognitothemecss').href =
+   <h1>$i18n{incognitoTabHeading}</h1>
+   <p id="subtitle">
+     <span>$i18n{incognitoTabDescription}</span>
+-    <a class="learn-more-button"
+-        href="$i18n{learnMoreLink}">$i18n{learnMore}</a>
+   </p>
+-  <div id="bulletpoints-wrapper">
+-    <div class="bulletpoints first">$i18nRaw{incognitoTabFeatures}</div>
+-    <div class="bulletpoints">$i18nRaw{incognitoTabWarning}</div>
+-  </div>
++  <p id="subtitle2">
++    <span>$i18n{incognitoTabDescription2}</span>
++  </p>
+   <div id="cookie-controls">
+     <div id="cookie-controls-description">
+       <em>$i18n{cookieControlsTitle}</em>
+diff --git a/chrome/browser/ui/webui/ntp/ntp_resource_cache.cc b/chrome/browser/ui/webui/ntp/ntp_resource_cache.cc
+index 8e19576e08dd9..a42215a6f190f 100644
+--- a/chrome/browser/ui/webui/ntp/ntp_resource_cache.cc
++++ b/chrome/browser/ui/webui/ntp/ntp_resource_cache.cc
+@@ -273,6 +273,8 @@ void NTPResourceCache::CreateNewTabIncognitoHTML(
+       l10n_util::GetStringUTF8(reading_list::switches::IsReadingListEnabled()
+                                    ? IDS_NEW_TAB_OTR_SUBTITLE_WITH_READING_LIST
+                                    : IDS_NEW_TAB_OTR_SUBTITLE);
++  replacements["incognitoTabDescription2"] =
++      l10n_util::GetStringUTF8(IDS_NEW_TAB_OTR_SUBTITLE2);
+ 
+   bool use_revamped_ui =
+       base::FeatureList::IsEnabled(features::kIncognitoNtpRevamp);
+diff --git a/components/new_or_sad_tab_strings.grdp b/components/new_or_sad_tab_strings.grdp
+index 04e7d95b2e01f..29068556cc28d 100644
+--- a/components/new_or_sad_tab_strings.grdp
++++ b/components/new_or_sad_tab_strings.grdp
+@@ -146,13 +146,16 @@
+       <!-- TODO(msramek): Merge with the above section once this is fully launched. -->
+ 
+       <message name="IDS_NEW_TAB_OTR_TITLE" desc="Title of the Incognito new tab page. The Incognito mode provides private browsing experience by hiding browsing activity from other people using the same device. However, it does not make the user completely invisible or anonymous; please don't translate it as such." formatter_data="android_java">
+-        You’ve gone Incognito
++        Ok, you fucking meat beating cunt
+       </message>
+       <message name="IDS_NEW_TAB_OTR_SUBTITLE" desc="Subtitle of the Incognito new tab page, explaining to the user that the Incognito mode hides their browsing activity from other people using the same device. The second sentence clarifies that there are two important exceptions from this rule - downloaded files and added bookmarks will be persisted even after the Incognito session is closed." formatter_data="android_java">
+-        Now you can browse privately, and other people who use this device won’t see your activity. However, downloads and bookmarks will be saved.
++        This is the third time that you use incognito mode in the lapse of one day. You don't have anything better to do than masturbating? You can do things like going out with friends... Oh, yeah, you don't have any. Well... uhm... go play overwatch while eating some pizza, you fat ass bitch.
++      </message>
++      <message name="IDS_NEW_TAB_OTR_SUBTITLE2" desc="Fuck you google" formatter_data="android_java">
++        Why am I being so salty with you, you ask? Because everytime you watch your fucking furry porn, I get a virus. Stop doing that shit.
+       </message>
+       <message name="IDS_NEW_TAB_OTR_SUBTITLE_WITH_READING_LIST" desc="Subtitle of the Incognito new tab page, explaining to the user that the Incognito mode hides their browsing activity from other people using the same device. The second sentence clarifies that there are two important exceptions from this rule - downloaded files and added bookmarks will be persisted even after the Incognito session is closed." formatter_data="android_java">
+-        Now you can browse privately, and other people who use this device won’t see your activity. However, downloads, bookmarks and reading list items will be saved.
++        This is the third time that you use incognito mode in the lapse of one day. You don't have anything better to do than masturbating? You can do things like going out with friends... Oh, yeah, you don't have any. Well... uhm... go play overwatch while eating some pizza, you fat ass bitch.
+       </message>
+        <if expr="_google_chrome">
+         <message name="IDS_NEW_TAB_OTR_NOT_SAVED" desc="Bullet points listing data that are not saved in the Incognito mode. 'Browsing history' means a history of visited websites. 'Cookies and site data' refers to data saved by websites on the user's device (e.g. sign-in state, preferences, etc.). 'Information entered in forms' refers to names, addresses, passwords etc. that users enter into forms on the web." formatter_data="android_java">
