@@ -1,0 +1,363 @@
+diff --git a/chrome/browser/about_flags.cc b/chrome/browser/about_flags.cc
+index 099742e548f61..80bd4b166f58b 100644
+--- a/chrome/browser/about_flags.cc
++++ b/chrome/browser/about_flags.cc
+@@ -9062,6 +9062,22 @@ const FeatureEntry kFeatureEntries[] = {
+     // "LoginCustomFlags" in tools/metrics/histograms/enums.xml. See "Flag
+     // Histograms" in tools/metrics/histograms/README.md (run the
+     // AboutFlagsHistogramTest unit test to verify this process).
++
++    {"fuck-google-branding", "Fuck google branding",
++     "Fuck jewgle branding bullshit, use your own colors, even in incognito.",
++     kOsAll, FEATURE_VALUE_TYPE(features::kFuckGoogleBranding)},
++
++    {"enable-user-select-node", "Enable user-select: none",
++     "Honor `user-select: none` css attributes.",
++     kOsAll, FEATURE_VALUE_TYPE(blink::features::kEnableUserSelectNone)},
++
++    {"pac-sanitize-https", "Sanitize HTTPS urls in PAC.",
++     "Disabling this with untrusted PAC scripts can be a security issue.",
++     kOsAll, FEATURE_VALUE_TYPE(net::features::kPacSanitizeHttps)},
++
++    {"always-hide-buttons", "Always hide windows buttons",
++     "Always hide window buttons (close/minimize/etc), even when chromium would normally insist on using CSD.",
++     kOsAll, FEATURE_VALUE_TYPE(features::kAlwaysHideButtons)},
+ };
+ 
+ class FlagsStateSingleton : public flags_ui::FlagsState::Delegate {
+diff --git a/chrome/browser/themes/theme_service.cc b/chrome/browser/themes/theme_service.cc
+index 8ff7b6d7eb813..4bb88d93a1718 100644
+--- a/chrome/browser/themes/theme_service.cc
++++ b/chrome/browser/themes/theme_service.cc
+@@ -65,6 +65,7 @@
+ #include "ui/base/layout.h"
+ #include "ui/color/color_id.h"
+ #include "ui/color/color_provider.h"
++#include "ui/gfx/switches.h"
+ #include "ui/native_theme/native_theme.h"
+ 
+ #if BUILDFLAG(ENABLE_EXTENSIONS)
+@@ -236,7 +237,9 @@ base::RefCountedMemory* ThemeService::BrowserThemeProvider::GetRawData(
+ 
+ CustomThemeSupplier* ThemeService::BrowserThemeProvider::GetThemeSupplier()
+     const {
+-  return incognito_ ? nullptr : delegate_->GetThemeSupplier();
++  if (incognito_ && !base::FeatureList::IsEnabled(features::kFuckGoogleBranding))
++    return nullptr;
++  return delegate_->GetThemeSupplier();
+ }
+ 
+ // ThemeService ---------------------------------------------------------------
+diff --git a/chrome/browser/ui/color/linux/native_chrome_color_mixer_linux.cc b/chrome/browser/ui/color/linux/native_chrome_color_mixer_linux.cc
+index f339f701ef346..2443834a508d7 100644
+--- a/chrome/browser/ui/color/linux/native_chrome_color_mixer_linux.cc
++++ b/chrome/browser/ui/color/linux/native_chrome_color_mixer_linux.cc
+@@ -148,10 +148,15 @@ void AddNativeChromeColorMixer(ui::ColorProvider* provider,
+       ui::kColorNativeTabForegroundInactiveFrameActive};
+   mixer[kColorTabForegroundInactiveFrameInactive] = {
+       ui::kColorNativeTabForegroundInactiveFrameInactive};
++  mixer[kColorTabForegroundActiveFrameInactive] = {
++      ui::kColorNativeTabForegroundInactiveFrameInactive};
++  mixer[kColorTabForegroundActiveFrameActive] = {
++      ui::kColorNativeTabForegroundInactiveFrameActive};
+   mixer[kColorTabStrokeFrameActive] = {kColorToolbarTopSeparatorFrameActive};
+   mixer[kColorTabStrokeFrameInactive] = {
+       kColorToolbarTopSeparatorFrameInactive};
+   mixer[kColorToolbar] = {ui::kColorNativeToolbarBackground};
++  mixer[kColorToolbarButtonBackgroundHighlightedDefault] = {ui::kColorNativeToolbarBackground};
+   mixer[kColorToolbarButtonIcon] = {kColorToolbarText};
+   mixer[kColorToolbarButtonIconHovered] = {kColorToolbarButtonIcon};
+   mixer[kColorToolbarContentAreaSeparator] = {kColorToolbarSeparator};
+diff --git a/chrome/browser/ui/views/frame/browser_frame.cc b/chrome/browser/ui/views/frame/browser_frame.cc
+index f3cc4af3bdae4..daa8405454882 100644
+--- a/chrome/browser/ui/views/frame/browser_frame.cc
++++ b/chrome/browser/ui/views/frame/browser_frame.cc
+@@ -36,6 +36,7 @@
+ #include "ui/base/hit_test.h"
+ #include "ui/events/event_handler.h"
+ #include "ui/gfx/font_list.h"
++#include "ui/gfx/switches.h"
+ #include "ui/views/controls/menu/menu_runner.h"
+ #include "ui/views/widget/native_widget.h"
+ 
+@@ -395,7 +396,8 @@ void BrowserFrame::SelectNativeTheme() {
+   // Select between regular, dark and GTK theme.
+   ui::NativeTheme* native_theme = ui::NativeTheme::GetInstanceForNativeUi();
+ 
+-  if (browser_view_->browser()->profile()->IsIncognitoProfile()) {
++  if (browser_view_->browser()->profile()->IsIncognitoProfile() &&
++      !base::FeatureList::IsEnabled(features::kFuckGoogleBranding)) {
+     // No matter if we are using the default theme or not we always use the dark
+     // ui instance.
+     SetNativeTheme(ui::NativeTheme::GetInstanceForDarkUI());
+diff --git a/chrome/browser/ui/views/frame/opaque_browser_frame_view.cc b/chrome/browser/ui/views/frame/opaque_browser_frame_view.cc
+index e8754a84a302b..90bdb80f72ab9 100644
+--- a/chrome/browser/ui/views/frame/opaque_browser_frame_view.cc
++++ b/chrome/browser/ui/views/frame/opaque_browser_frame_view.cc
+@@ -25,6 +25,7 @@
+ #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
+ #include "chrome/browser/ui/views/web_apps/frame_toolbar/web_app_frame_toolbar_view.h"
+ #include "chrome/browser/ui/web_applications/app_browser_controller.h"
++#include "chrome/common/chrome_features.h"
+ #include "chrome/grit/generated_resources.h"
+ #include "chrome/grit/theme_resources.h"
+ #include "components/strings/grit/components_strings.h"
+@@ -481,6 +482,8 @@ gfx::Size OpaqueBrowserFrameView::GetBrowserViewMinimumSize() const {
+ }
+ 
+ bool OpaqueBrowserFrameView::ShouldShowCaptionButtons() const {
++  if (base::FeatureList::IsEnabled(features::kAlwaysHideButtons))
++    return false;
+   return GetShowWindowTitleBar();
+ }
+ 
+diff --git a/chrome/common/chrome_features.cc b/chrome/common/chrome_features.cc
+index dcbd5b9d65495..9c6b1ff9fd9a9 100644
+--- a/chrome/common/chrome_features.cc
++++ b/chrome/common/chrome_features.cc
+@@ -1188,4 +1188,7 @@ const base::Feature kSupportsRtcWakeOver24Hours{
+ const base::Feature kUseWebAppDBInsteadOfExternalPrefs{
+     "UseWebAppDBInsteadOfExternalPrefs", base::FEATURE_ENABLED_BY_DEFAULT};
+ 
++const base::Feature kAlwaysHideButtons{
++    "AlwaysHideButtons", base::FEATURE_DISABLED_BY_DEFAULT};
++
+ }  // namespace features
+diff --git a/chrome/common/chrome_features.h b/chrome/common/chrome_features.h
+index cef5739c30cd2..706d2e575a964 100644
+--- a/chrome/common/chrome_features.h
++++ b/chrome/common/chrome_features.h
+@@ -828,6 +828,10 @@ bool PrefServiceEnabled();
+ // DON'T ADD RANDOM STUFF HERE. Put it in the main section above in
+ // alphabetical order, or in one of the ifdefs (also in order in each section).
+ 
++// FUCK YOU, I ADD RANDOM STUFF HERE!
++COMPONENT_EXPORT(CHROME_FEATURES)
++extern const base::Feature kAlwaysHideButtons;
++
+ }  // namespace features
+ 
+ #endif  // CHROME_COMMON_CHROME_FEATURES_H_
+diff --git a/net/base/features.cc b/net/base/features.cc
+index 00c0db4a2c325..3c2b1775fe5c0 100644
+--- a/net/base/features.cc
++++ b/net/base/features.cc
+@@ -334,4 +334,8 @@ constexpr int kStorageAccessAPIDefaultImplicitGrantLimit = 5;
+ const base::FeatureParam<int> kStorageAccessAPIImplicitGrantLimit{
+     &kStorageAccessAPI, "storage-access-api-implicit-grant-limit",
+     kStorageAccessAPIDefaultImplicitGrantLimit};
++
++const base::Feature kPacSanitizeHttps{
++  "PacSanitizeHttps", base::FEATURE_ENABLED_BY_DEFAULT};
++
+ }  // namespace net::features
+diff --git a/net/base/features.h b/net/base/features.h
+index c7ce137e61db9..c93454ffcf2e2 100644
+--- a/net/base/features.h
++++ b/net/base/features.h
+@@ -466,6 +466,8 @@ NET_EXPORT extern const int kStorageAccessAPIDefaultImplicitGrantLimit;
+ NET_EXPORT extern const base::FeatureParam<int>
+     kStorageAccessAPIImplicitGrantLimit;
+ 
++NET_EXPORT extern const base::Feature kPacSanitizeHttps;
++
+ }  // namespace net::features
+ 
+ #endif  // NET_BASE_FEATURES_H_
+diff --git a/net/proxy_resolution/configured_proxy_resolution_service.cc b/net/proxy_resolution/configured_proxy_resolution_service.cc
+index d8d6fe7b4c584..7794524b1de6a 100644
+--- a/net/proxy_resolution/configured_proxy_resolution_service.cc
++++ b/net/proxy_resolution/configured_proxy_resolution_service.cc
+@@ -24,6 +24,7 @@
+ #include "base/values.h"
+ #include "build/build_config.h"
+ #include "build/chromeos_buildflags.h"
++#include "net/base/features.h"
+ #include "net/base/net_errors.h"
+ #include "net/base/net_info_source_list.h"
+ #include "net/base/network_isolation_key.h"
+@@ -342,7 +343,8 @@ GURL SanitizeUrl(const GURL& url) {
+   replacements.ClearPassword();
+   replacements.ClearRef();
+ 
+-  if (url.SchemeIsCryptographic()) {
++  if (url.SchemeIsCryptographic() &&
++      base::FeatureList::IsEnabled(features::kPacSanitizeHttps)) {
+     replacements.ClearPath();
+     replacements.ClearQuery();
+   }
+diff --git a/third_party/blink/common/features.cc b/third_party/blink/common/features.cc
+index 62eb3b3ee8d3c..6ba8216adbe1f 100644
+--- a/third_party/blink/common/features.cc
++++ b/third_party/blink/common/features.cc
+@@ -1560,5 +1560,8 @@ const base::Feature kCSSOverflowForReplacedElements{
+ const base::Feature kClipboardUnsanitizedContent{
+     "ClipboardUnsanitizedContent", base::FEATURE_DISABLED_BY_DEFAULT};
+ 
++const base::Feature kEnableUserSelectNone{
++    "EnableUserSelectNone", base::FEATURE_ENABLED_BY_DEFAULT};
++
+ }  // namespace features
+ }  // namespace blink
+diff --git a/third_party/blink/public/common/features.h b/third_party/blink/public/common/features.h
+index a0089c41e38e8..4b9d3f28a78cb 100644
+--- a/third_party/blink/public/common/features.h
++++ b/third_party/blink/public/common/features.h
+@@ -815,6 +815,8 @@ BLINK_COMMON_EXPORT extern const base::Feature kCSSOverflowForReplacedElements;
+ // it is only applicable to HTML format. See crbug.com/1268679.
+ BLINK_COMMON_EXPORT extern const base::Feature kClipboardUnsanitizedContent;
+ 
++BLINK_COMMON_EXPORT extern const base::Feature kEnableUserSelectNone;
++
+ }  // namespace features
+ }  // namespace blink
+ 
+diff --git a/third_party/blink/renderer/core/dom/node.cc b/third_party/blink/renderer/core/dom/node.cc
+index f1e42bf7b75e1..5a5c0414169f4 100644
+--- a/third_party/blink/renderer/core/dom/node.cc
++++ b/third_party/blink/renderer/core/dom/node.cc
+@@ -1688,7 +1688,8 @@ bool Node::CanStartSelection() const {
+   if (GetLayoutObject()) {
+     const ComputedStyle& style = GetLayoutObject()->StyleRef();
+     EUserSelect user_select = style.UsedUserSelect();
+-    if (user_select == EUserSelect::kNone)
++    if (user_select == EUserSelect::kNone &&
++        base::FeatureList::IsEnabled(features::kEnableUserSelectNone))
+       return false;
+     // We allow selections to begin within |user-select: text/all| sub trees
+     // but not if the element is draggable.
+diff --git a/third_party/blink/renderer/core/frame/smart_clip.cc b/third_party/blink/renderer/core/frame/smart_clip.cc
+index fc9d7af01b3c4..5f81d2f3f4f19 100644
+--- a/third_party/blink/renderer/core/frame/smart_clip.cc
++++ b/third_party/blink/renderer/core/frame/smart_clip.cc
+@@ -235,9 +235,11 @@ String SmartClip::ExtractTextFromNode(Node* node) {
+ 
+   StringBuilder result;
+   for (Node& current_node : NodeTraversal::InclusiveDescendantsOf(*node)) {
+-    const ComputedStyle* style = current_node.GetComputedStyle();
+-    if (!style || style->UsedUserSelect() == EUserSelect::kNone)
+-      continue;
++    if (base::FeatureList::IsEnabled(features::kEnableUserSelectNone)) {
++      const ComputedStyle* style = current_node.GetComputedStyle();
++      if (!style || style->UsedUserSelect() == EUserSelect::kNone)
++        continue;
++    }
+ 
+     if (Node* node_from_frame = NodeInsideFrame(&current_node))
+       result.Append(ExtractTextFromNode(node_from_frame));
+diff --git a/third_party/blink/renderer/core/style/computed_style.cc b/third_party/blink/renderer/core/style/computed_style.cc
+index 13b911ccf2db3..c723f627b5d80 100644
+--- a/third_party/blink/renderer/core/style/computed_style.cc
++++ b/third_party/blink/renderer/core/style/computed_style.cc
+@@ -33,6 +33,7 @@
+ #include "base/numerics/clamped_math.h"
+ #include "build/build_config.h"
+ #include "cc/input/overscroll_behavior.h"
++#include "third_party/blink/public/common/features.h"
+ #include "third_party/blink/public/mojom/css/preferred_color_scheme.mojom-blink.h"
+ #include "third_party/blink/renderer/core/animation/css/css_animation_data.h"
+ #include "third_party/blink/renderer/core/animation/css/css_transition_data.h"
+@@ -2774,6 +2775,13 @@ void ComputedStyle::SetUsedColorScheme(
+   SetColorSchemeForced(forced_scheme);
+ }
+ 
++bool ComputedStyle::IsSelectable() const {
++  return !IsInert() &&
++         (!base::FeatureList::IsEnabled(features::kEnableUserSelectNone) ||
++          UserSelectInternal() != EUserSelect::kNone ||
++          UserModifyInternal() != EUserModify::kReadOnly);
++}
++
+ STATIC_ASSERT_ENUM(cc::OverscrollBehavior::Type::kAuto,
+                    EOverscrollBehavior::kAuto);
+ STATIC_ASSERT_ENUM(cc::OverscrollBehavior::Type::kContain,
+diff --git a/third_party/blink/renderer/core/style/computed_style.h b/third_party/blink/renderer/core/style/computed_style.h
+index 5bbddd7f90570..457fc26a88edf 100644
+--- a/third_party/blink/renderer/core/style/computed_style.h
++++ b/third_party/blink/renderer/core/style/computed_style.h
+@@ -2263,10 +2263,7 @@ class ComputedStyle : public ComputedStyleBase,
+     return UserSelectInternal();
+   }
+ 
+-  bool IsSelectable() const {
+-    return !IsInert() && !(UserSelectInternal() == EUserSelect::kNone &&
+-                           UserModifyInternal() == EUserModify::kReadOnly);
+-  }
++  bool IsSelectable() const;
+ 
+   bool IsFocusable() const {
+     // TODO: Maybe `display: contents` shouldn't prevent focusability, see
+diff --git a/ui/gfx/BUILD.gn b/ui/gfx/BUILD.gn
+index 9fd5b696fbf8e..0dc6d6345301b 100644
+--- a/ui/gfx/BUILD.gn
++++ b/ui/gfx/BUILD.gn
+@@ -29,6 +29,7 @@ component("color_utils") {
+     "color_utils.h",
+   ]
+   defines = [ "GFX_IMPLEMENTATION" ]
++  deps = [ ":gfx_switches" ]
+   public_deps = [
+     ":gfx_export",
+     "//base",
+diff --git a/ui/gfx/color_utils.cc b/ui/gfx/color_utils.cc
+index 702431c30eb18..559ff34dd872e 100644
+--- a/ui/gfx/color_utils.cc
++++ b/ui/gfx/color_utils.cc
+@@ -11,6 +11,7 @@
+ #include <ostream>
+ 
+ #include "base/check_op.h"
++#include "base/feature_list.h"
+ #include "base/notreached.h"
+ #include "base/numerics/safe_conversions.h"
+ #include "base/strings/string_number_conversions.h"
+@@ -18,6 +19,7 @@
+ #include "build/build_config.h"
+ #include "third_party/skia/include/core/SkBitmap.h"
+ #include "ui/gfx/color_palette.h"
++#include "ui/gfx/switches.h"
+ 
+ #if BUILDFLAG(IS_WIN)
+ #include <windows.h>
+@@ -286,6 +288,8 @@ SkColor PickGoogleColorImpl(SkColor color, T pick_color) {
+ SkColor PickGoogleColor(SkColor color,
+                         SkColor background_color,
+                         float min_contrast) {
++  if (base::FeatureList::IsEnabled(features::kFuckGoogleBranding))
++    return color;
+   const auto pick_color = [&](const SkColor(&colors)[kNumGoogleColors]) {
+     return PickGoogleColor(colors, color, background_color, background_color,
+                            min_contrast);
+@@ -297,6 +301,8 @@ SkColor PickGoogleColor(SkColor color,
+                         SkColor background_color_a,
+                         SkColor background_color_b,
+                         float min_contrast) {
++  if (base::FeatureList::IsEnabled(features::kFuckGoogleBranding))
++    return color;
+   const auto pick_color = [&](const SkColor(&colors)[kNumGoogleColors]) {
+     return PickGoogleColor(colors, color, background_color_a,
+                            background_color_b, min_contrast);
+diff --git a/ui/gfx/switches.cc b/ui/gfx/switches.cc
+index 0e8044c6d8700..54cb5e546a363 100644
+--- a/ui/gfx/switches.cc
++++ b/ui/gfx/switches.cc
+@@ -55,4 +55,7 @@ const base::Feature kOddWidthMultiPlanarBuffers{
+ #endif
+ };
+ 
++const base::Feature kFuckGoogleBranding{
++    "FuckGoogleBranding", base::FEATURE_DISABLED_BY_DEFAULT};
++
+ }  // namespace features
+diff --git a/ui/gfx/switches.h b/ui/gfx/switches.h
+index e8e5d44e24636..3f7fd3e5edb89 100644
+--- a/ui/gfx/switches.h
++++ b/ui/gfx/switches.h
+@@ -27,6 +27,7 @@ GFX_SWITCHES_EXPORT extern const char kNoXshm[];
+ namespace features {
+ GFX_SWITCHES_EXPORT extern const base::Feature kOddHeightMultiPlanarBuffers;
+ GFX_SWITCHES_EXPORT extern const base::Feature kOddWidthMultiPlanarBuffers;
++GFX_SWITCHES_EXPORT extern const base::Feature kFuckGoogleBranding;
+ }  // namespace features
+ 
+ #endif  // UI_GFX_SWITCHES_H_
